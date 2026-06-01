@@ -1,24 +1,30 @@
-from flask import Flask
+import os
+from flask import Flask, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
-import os
 
+# Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
+# Enable CORS so your frontend can talk to this backend safely
 CORS(app)
 
-# Register routes
-from routes.upload import upload_bp
-from routes.history import history_bp
+# Import routes directly from the root folder
+from upload import upload_bp
+from history import history_bp
 
-app.register_blueprint(upload_bp)
-app.register_blueprint(history_bp)
+# Register Blueprints
+app.register_blueprint(upload_bp, url_prefix='/api')
+app.register_blueprint(history_bp, url_prefix='/api')
 
-@app.route("/")
-def index():
-    return {"status": "Cloud Image Recognition API is running ✅"}
+@app.route('/', methods=['GET'])
+def home():
+    return jsonify({
+        "status": "Cloud Image Recognition API is running ✅",
+        "message": "Welcome to the backend! Ready for image processing."
+    }), 200
 
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
