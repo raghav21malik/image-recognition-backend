@@ -7,12 +7,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
+
 # Enable CORS so your frontend can talk to this backend safely
 CORS(app)
 
-# Import routes directly from the root folder
-from upload import upload_bp
-from history import history_bp
+# Import routes correctly from the routes folder
+from routes.upload import upload_bp
+from routes.history import history_bp
 
 # Register Blueprints
 app.register_blueprint(upload_bp, url_prefix='/api')
