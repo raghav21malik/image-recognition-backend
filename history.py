@@ -1,21 +1,31 @@
+import os
 from flask import Blueprint, jsonify
+from supabase import create_client, Client
 
-history_bp = Blueprint("history", __name__)
+# This name must match your app.py imports
+history_bp = Blueprint('history', __name__)
 
-@history_bp.route("/history", methods=["GET"])
+# Initialize Supabase client directly using your Render environment variables
+url: str = os.getenv("SUPABASE_URL")
+key: str = os.getenv("SUPABASE_KEY")
+
+# Clean up trailing URL parts if needed to ensure connection compatibility
+if url and url.endswith('/rest/v1/'):
+    url = url.replace('/rest/v1/', '')
+
+supabase: Client = create_client(url, key)
+
+@history_bp.route('/history', methods=['GET'])
 def get_history():
-    # --- PHASE 3: Will fetch real data from Supabase ---
-    return jsonify({
-        "success": True,
-        "history": [],
-        "message": "History endpoint ready ✅ — Supabase will be connected in Phase 3"
-    }), 200
-
-@history_bp.route("/history/<int:record_id>", methods=["GET"])
-def get_single(record_id):
-    # --- PHASE 3: Will fetch single record from Supabase ---
-    return jsonify({
-        "success": True,
-        "record": None,
-        "message": f"Record {record_id} endpoint ready ✅"
-    }), 200
+    try:
+        # Fetch records from your scan_history table, ordered by latest first
+        response = supabase.table("scan_history").select("*").order("created_at", descending=True).execute()
+        
+        return jsonify({
+            "status": "success",
+            "count": len(response.data),
+            "history": response.data
+        }), 200
+        
+    except Exception as e:
+        return jsonify({"error": f"Database fetch failed: {str(e)}"}), 500
