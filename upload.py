@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from utils.cloudinary_helper import upload_to_cloudinary
 import os
 
 upload_bp = Blueprint("upload", __name__)
@@ -23,8 +24,10 @@ def upload_image():
 
         image_bytes = file.read()
 
-        # --- PHASE 2: Cloudinary upload will be added here ---
-        image_url = "pending_cloudinary_setup"
+        # --- PHASE 2: Upload image to Cloudinary ✅ ---
+        cloudinary_data = upload_to_cloudinary(image_bytes, file.filename)
+        image_url = cloudinary_data["image_url"]
+        public_id = cloudinary_data["public_id"]
 
         # --- PHASE 4: Google Vision AI will be added here ---
         ai_results = {
@@ -42,9 +45,16 @@ def upload_image():
         return jsonify({
             "success": True,
             "image_url": image_url,
+            "public_id": public_id,
             "filename": file.filename,
+            "image_meta": {
+                "width": cloudinary_data["width"],
+                "height": cloudinary_data["height"],
+                "format": cloudinary_data["format"],
+                "size_bytes": cloudinary_data["size_bytes"]
+            },
             "ai_results": ai_results,
-            "message": "Phase 1 working ✅ — AI and Storage will be connected in next phases"
+            "message": "Image uploaded to Cloudinary ✅ — AI coming in Phase 4"
         }), 200
 
     except Exception as e:
