@@ -7,36 +7,57 @@ from supabase import create_client, Client
 
 upload_bp = Blueprint('upload', __name__)
 
-# 1. Configure Cloudinary
+# Cloudinary Config
 cloudinary.config(
     cloud_name=os.getenv('CLOUDINARY_CLOUD_NAME'),
     api_key=os.getenv('CLOUDINARY_API_KEY'),
     api_secret=os.getenv('CLOUDINARY_API_SECRET')
 )
 
-# 2. Configure Supabase
-url: str = os.getenv("SUPABASE_URL")
-key: str = os.getenv("SUPABASE_KEY")
+# Supabase Config
+url = os.getenv("SUPABASE_URL")
+key = os.getenv("SUPABASE_KEY")
+
 if url and url.endswith('/rest/v1/'):
     url = url.replace('/rest/v1/', '')
+
 supabase: Client = create_client(url, key)
 
-# 3. Google Vision API Endpoint Config
+# Google Vision Config
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 VISION_API_URL = f"https://vision.googleapis.com/v1/images:annotate?key={GOOGLE_API_KEY}"
 
+
 @upload_bp.route('/upload', methods=['POST'])
 def upload_image():
+
+    # DEBUG LOGS
+    print("=" * 50)
+    print("CONTENT TYPE:", request.content_type)
+    print("FILES:", request.files)
+    print("FORM:", request.form)
+    print("=" * 50)
+
     if 'image' not in request.files:
-        return jsonify({"error": "No image file provided"}), 400
-        
+        return jsonify({
+            "error": "No image file provided",
+            "content_type": str(request.content_type),
+            "files_received": list(request.files.keys()),
+            "form_received": list(request.form.keys())
+        }), 400
+
     file = request.files['image']
+
     if file.filename == '':
-        return jsonify({"error": "No file selected"}), 400
+        return jsonify({
+            "error": "No file selected"
+        }), 400
 
     try:
-        # Step A: Upload image to Cloudinary cloud storage
+
+        # Upload to Cloudinary
         upload_result = cloudinary.uploader.upload(file)
+
         img_url = upload_result.get('secure_url')
         pub_id = upload_result.get('public_id')
         width = upload_result.get('width')
@@ -44,44 +65,101 @@ def upload_image():
         fmt = upload_result.get('format')
         size = upload_result.get('bytes')
 
-        # Step B: Call Google Cloud Vision API using the Cloudinary URL
+        # Google Vision Request
         vision_payload = {
             "requests": [
                 {
-                    "image": {"source": {"imageUri": img_url}},
+                    "image": {
+                        "source": {
+                            "imageUri": img_url
+                        }
+                    },
                     "features": [
-                        {"type": "LABEL_DETECTION", "maxResults": 5},
-                        {"type": "OBJECT_LOCALIZATION", "maxResults": 5},
-                        {"type": "TEXT_DETECTION", "maxResults": 1},
-                        {"type": "LANDMARK_DETECTION", "maxResults": 1},
-                        {"type": "IMAGE_PROPERTIES", "maxResults": 1}
+                        {
+                            "type": "LABEL_DETECTION",
+                            "maxResults": 5
+                        },
+                        {
+                            "type": "OBJECT_LOCALIZATION",
+                            "maxResults": 5
+                        },
+                        {
+                            "type": "TEXT_DETECTION",
+                            "maxResults": 1
+                        },
+                        {
+                            "type": "LANDMARK_DETECTION",
+                            "maxResults": 1
+                        },
+                        {
+                            "type": "IMAGE_PROPERTIES",
+                            "maxResults": 1
+                        }
                     ]
                 }
             ]
         }
-        
-        vision_response = requests.post(VISION_API_URL, json=vision_payload).json()
-        annotations = vision_response['responses'][0]
 
-        # Step C: Parse Google Vision AI Response
-        labels = [label['description'] for label in annotations.get('labelAnnotations', [])]
-        objects = [obj['name'] for obj in annotations.get('localizedObjectAnnotations', [])]
-        
-        text_annotations = annotations.get('textAnnotations', [])
-        detected_text = text_annotations[0]['description'] if text_annotations else None
-        
-        landmark_annotations = annotations.get('landmarkAnnotations', [])
-        landmark = landmark_annotations[0]['description'] if landmark_annotations else None
+        vision_response = requests.post(
+            VISION_API_URL,
+            json=vision_payload
+        ).json()
 
-        # Extract dominant colors safely
+        print("VISION RESPONSE:", vision_response)
+
+        if "responses" not in vision_response:
+            return jsonify({
+                "error": "Google Vision API failed",
+                "details": vision_response
+            }), 500
+
+        annotations = vision_response["responses"][0]
+
+        labels = [
+            label["description"]
+            for label in annotations.get("labelAnnotations", [])
+        ]
+
+        objects = [
+            obj["name"]
+            for obj in annotations.get("localizedObjectAnnotations", [])
+        ]
+
+        text_annotations = annotations.get("textAnnotations", [])
+        detected_text = (
+            text_annotations[0]["description"]
+            if text_annotations else None
+        )
+
+        landmark_annotations = annotations.get("landmarkAnnotations", [])
+        landmark = (
+            landmark_annotations[0]["description"]
+            if landmark_annotations else None
+        )
+
         dominant_colors = []
-        img_props = annotations.get('imagePropertiesAnnotation', {})
-        if img_props and 'dominantColors' in img_props:
-            for color_info in img_props['dominantColors'].get('colors', [])[:3]:
-                c = color_info.get('color', {})
-                dominant_colors.append(f"rgb({c.get('red',0)}, {c.get('green',0)}, {c.get('blue',0)})")
 
-        # Step D: Insert the rich AI record into Supabase 'scan_history'
+        img_props = annotations.get(
+            "imagePropertiesAnnotation",
+            {}
+        )
+
+        if img_props and "dominantColors" in img_props:
+
+            for color_info in img_props["dominantColors"].get(
+                "colors",
+                []
+            )[:3]:
+
+                c = color_info.get("color", {})
+
+                dominant_colors.append(
+                    f"rgb({c.get('red',0)}, "
+                    f"{c.get('green',0)}, "
+                    f"{c.get('blue',0)})"
+                )
+
+        # Save to Supabase
         db_data = {
             "filename": file.filename,
             "image_url": img_url,
@@ -90,18 +168,21 @@ def upload_image():
             "height": height,
             "format": fmt,
             "size_bytes": size,
-            "labels": labels if labels else None,
-            "objects": objects if objects else None,
+            "labels": labels,
+            "objects": objects,
             "detected_text": detected_text,
             "landmark": landmark,
-            "dominant_colors": dominant_colors if dominant_colors else None
+            "dominant_colors": dominant_colors
         }
-        
-        supabase.table("scan_history").insert(db_data).execute()
-        
-        # Return complete AI analysis data back to client
+
+        supabase.table(
+            "scan_history"
+        ).insert(
+            db_data
+        ).execute()
+
         return jsonify({
-            "message": "Image analyzed and saved successfully! 🧠🚀",
+            "message": "Image analyzed and saved successfully!",
             "image_url": img_url,
             "analysis": {
                 "labels": labels,
@@ -113,4 +194,9 @@ def upload_image():
         }), 200
 
     except Exception as e:
-        return jsonify({"error": f"AI Backend operation failed: {str(e)}"}), 500
+
+        print("UPLOAD ERROR:", str(e))
+
+        return jsonify({
+            "error": str(e)
+        }), 500
