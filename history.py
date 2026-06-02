@@ -19,7 +19,9 @@ supabase: Client = create_client(url, key)
 def get_history():
     try:
         # Fetch records from your scan_history table, ordered by latest first
-        response = supabase.table("scan_history").select("*").order("created_at", descending=True).execute()
+        response = supabase.table("scan_history")\
+    .select("*")\
+    .execute()
         
         return jsonify({
             "status": "success",
