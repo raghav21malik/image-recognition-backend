@@ -27,7 +27,7 @@ supabase: Client = create_client(url, key)
 HF_API_TOKEN = os.getenv("HF_API_TOKEN")
 
 HF_API_URL = (
-    "https://api-inference.huggingface.co/models/"
+    "https://router.huggingface.co/hf-inference/models/"
     "google/vit-base-patch16-224"
 )
 
