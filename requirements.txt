@@ -5,6 +5,7 @@ gunicorn==21.2.0
 requests==2.31.0
 cloudinary==1.40.0
 supabase==2.3.4
+httpx==0.24.1
 postgrest==0.16.11
 storage3==0.7.7
 realtime==1.0.6
