@@ -3,19 +3,15 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
 
-# Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
 
-# Enable CORS so your frontend can talk to this backend safely
 CORS(app)
 
-# Import routes directly from the root directory
 from upload import upload_bp
 from history import history_bp
 
-# Register Blueprints
 app.register_blueprint(upload_bp, url_prefix='/api')
 app.register_blueprint(history_bp, url_prefix='/api')
 
