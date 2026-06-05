@@ -1,13 +1,7 @@
-
-// ══════════════════════════════════════
-// SUPABASE AUTH — Config
-// ══════════════════════════════════════
 const SUPABASE_URL  = 'https://sywhdzyimwezunvysxex.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5d2hkenlpbXdlenVudnlzeGV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzMzQyMjAsImV4cCI6MjA5NTkxMDIyMH0.AVsbtJvtRykSB7eyIooFBVmjwajrD8ucttt9Tn3V8pA';
 const AUTH_PAGE     = 'auth.html';
 
-
-// Load Supabase SDK dynamically
 (function loadSupabase() {
   const s = document.createElement('script');
   s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
@@ -339,7 +333,7 @@ function renderResults(data) {
         <div class="ranked-label-rank">#${i+1}</div>
         <div class="ranked-label-name">${l.name||l}</div>
         <div class="ranked-label-bar-wrap">
-          <div class="ranked-label-bar" data-width="${barWidth}" style="background:${color};"></div>
+          <div class="ranked-label-bar" data-width="${barWidth}" style="background:${color};width:0%;transition:width 1s cubic-bezier(0.4,0,0.2,1);"></div>
         </div>
       </div>`;
     });
@@ -415,6 +409,16 @@ function renderResults(data) {
 
   wrap.innerHTML = html;
   wrap.classList.add('visible');
+
+  // Animate ranked bars after DOM renders
+  var animTimer = setTimeout(function() {
+    var bars = wrap.querySelectorAll('.ranked-label-bar');
+    bars.forEach(function(bar) {
+      var w = bar.getAttribute('data-width') || '0';
+      bar.style.width = w + '%';
+    });
+  }, 150);
+
   document.getElementById('analyzeBtn').disabled = false;
 }
 
