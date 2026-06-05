@@ -6,6 +6,7 @@ const SUPABASE_URL  = 'https://sywhdzyimwezunvysxex.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5d2hkenlpbXdlenVudnlzeGV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzMzQyMjAsImV4cCI6MjA5NTkxMDIyMH0.AVsbtJvtRykSB7eyIooFBVmjwajrD8ucttt9Tn3V8pA';
 const AUTH_PAGE     = 'auth.html';
 
+
 // Load Supabase SDK dynamically
 (function loadSupabase() {
   const s = document.createElement('script');
@@ -316,16 +317,30 @@ function renderResults(data) {
 
   html += `<div class="results-grid">`;
 
-  // AI Label chips (FIX 1 — no fake confidence %)
+  // AI Label ranked bars
   if (labels.length) {
     html += `<div class="result-card full-width">
       <div class="result-card-title">🤖 AI Classification Results</div>
-      <div class="label-chips">`;
+      <div class="ranked-labels">`;
+    const total = labels.length;
     labels.forEach((l, i) => {
-      html += `<div class="label-chip">
-        <span class="label-chip-icon">${labelIcon(l.name)}</span>
-        <span class="label-chip-text">${l.name}</span>
-        <span class="label-chip-num">#${i+1}</span>
+      // Rank-based width: #1=100%, #2=80%, #3=65%, etc.
+      const rankWidths = [100, 80, 65, 52, 42];
+      const barWidth = rankWidths[i] || Math.max(100 - (i * 15), 15);
+      const rankColors = [
+        'linear-gradient(90deg,#6366f1,#22d3ee)',
+        'linear-gradient(90deg,#8b5cf6,#6366f1)',
+        'linear-gradient(90deg,#a78bfa,#8b5cf6)',
+        'linear-gradient(90deg,#c4b5fd,#a78bfa)',
+        'linear-gradient(90deg,#ddd6fe,#c4b5fd)',
+      ];
+      const color = rankColors[i] || rankColors[4];
+      html += `<div class="ranked-label-row">
+        <div class="ranked-label-rank">#${i+1}</div>
+        <div class="ranked-label-name">${l.name||l}</div>
+        <div class="ranked-label-bar-wrap">
+          <div class="ranked-label-bar" data-width="${barWidth}" style="background:${color};"></div>
+        </div>
       </div>`;
     });
     html += `</div></div>`;
@@ -714,6 +729,12 @@ window.renderResults = function(data) {
 // ══════════════════════════════════════
 
 async function loadAnalytics() {
+  // Force grid layout via JS in case CSS loads late
+  const statsRow = document.getElementById('analyticsStatsRow');
+  const analyticsGrid = document.querySelector('.analytics-grid');
+  if (statsRow) statsRow.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;';
+  if (analyticsGrid) analyticsGrid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:16px;';
+
   // Show skeletons
   showAnalyticsSkeleton();
 
@@ -755,8 +776,18 @@ async function loadAnalytics() {
     // ── Render stats ──
     animateCount('an-total',  records.length);
     animateCount('an-labels', totalLabels);
-    animateCount('an-week',   thisWeek);
     animateCount('an-today',  todayCount);
+
+    // Card 4 — most common label
+    const sortedLabels = Object.entries(labelCount).sort((a,b) => b[1]-a[1]);
+    const topLabel = sortedLabels.length ? sortedLabels[0][0] : '—';
+    const topEl = document.getElementById('an-top-label');
+    if (topEl) {
+      topEl.style.webkitTextFillColor = 'var(--accent3)';
+      topEl.style.fontSize = '18px';
+      topEl.style.fontWeight = '800';
+      topEl.textContent = topLabel.split(',')[0].trim(); // clean label
+    }
 
     // ── Scans per day (last 7 days) ──
     renderScansPerDayChart(records);
@@ -774,7 +805,7 @@ async function loadAnalytics() {
 
 function showAnalyticsSkeleton() {
   // Stats skeletons
-  ['an-total','an-labels','an-week','an-today'].forEach(id => {
+  ['an-total','an-labels','an-today','an-top-label'].forEach(id => {
     const el = document.getElementById(id);
     if (el) { el.textContent = '—'; }
   });
