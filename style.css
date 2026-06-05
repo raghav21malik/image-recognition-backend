@@ -1415,3 +1415,46 @@ h1, h2, h3, .section-heading, .nav-logo-text, .stat-value,
   .analytics-stats-row { grid-template-columns: 1fr 1fr; gap: 10px; }
   .an-stat-value { font-size: 22px; }
 }
+
+/* ══════════════════════════════════════
+   RANKED LABELS (Classification Results)
+══════════════════════════════════════ */
+.ranked-labels {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ranked-label-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.ranked-label-rank {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent3);
+  width: 24px;
+  flex-shrink: 0;
+}
+.ranked-label-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  width: 160px;
+  flex-shrink: 0;
+  text-transform: capitalize;
+}
+.ranked-label-bar-wrap {
+  flex: 1;
+  height: 8px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.ranked-label-bar {
+  height: 100%;
+  border-radius: 99px;
+  width: 0%;
+  transition: width 1s cubic-bezier(0.4,0,0.2,1);
+}
