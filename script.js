@@ -2,6 +2,7 @@ const SUPABASE_URL  = 'https://sywhdzyimwezunvysxex.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5d2hkenlpbXdlenVudnlzeGV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzMzQyMjAsImV4cCI6MjA5NTkxMDIyMH0.AVsbtJvtRykSB7eyIooFBVmjwajrD8ucttt9Tn3V8pA';
 const AUTH_PAGE     = 'auth.html';
 
+
 // Load Supabase SDK dynamically
 (function loadSupabase() {
   const s = document.createElement('script');
