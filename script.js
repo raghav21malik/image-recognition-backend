@@ -2,6 +2,7 @@ const SUPABASE_URL  = 'https://sywhdzyimwezunvysxex.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5d2hkenlpbXdlenVudnlzeGV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzMzQyMjAsImV4cCI6MjA5NTkxMDIyMH0.AVsbtJvtRykSB7eyIooFBVmjwajrD8ucttt9Tn3V8pA';
 const AUTH_PAGE     = 'auth.html';
 
+// Load Supabase SDK dynamically
 (function loadSupabase() {
   const s = document.createElement('script');
   s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
@@ -333,7 +334,7 @@ function renderResults(data) {
         <div class="ranked-label-rank">#${i+1}</div>
         <div class="ranked-label-name">${l.name||l}</div>
         <div class="ranked-label-bar-wrap">
-          <div class="ranked-label-bar" data-width="${barWidth}" style="background:${color};width:0%;transition:width 1s cubic-bezier(0.4,0,0.2,1);"></div>
+          <div class="ranked-label-bar-fill" style="height:100%;border-radius:99px;background:${color};width:0%;transition:width 1.2s cubic-bezier(0.4,0,0.2,1);" data-w="${barWidth}"></div>
         </div>
       </div>`;
     });
@@ -411,13 +412,11 @@ function renderResults(data) {
   wrap.classList.add('visible');
 
   // Animate ranked bars after DOM renders
-  var animTimer = setTimeout(function() {
-    var bars = wrap.querySelectorAll('.ranked-label-bar');
-    bars.forEach(function(bar) {
-      var w = bar.getAttribute('data-width') || '0';
-      bar.style.width = w + '%';
+  setTimeout(function() {
+    wrap.querySelectorAll('[data-w]').forEach(function(bar) {
+      bar.style.width = bar.getAttribute('data-w') + '%';
     });
-  }, 150);
+  }, 200);
 
   document.getElementById('analyzeBtn').disabled = false;
 }
@@ -746,12 +745,13 @@ async function loadAnalytics() {
     const authHeaders = await getAuthHeaders();
     const res = await fetch(`${BACKEND}/api/history`, { headers: authHeaders });
     const data = await res.json();
-    const records = data.history || [];
+    console.log('Analytics data:', data);
+    const records = data.history || data.data || [];
 
     if (!records.length) {
       document.getElementById('analyticsEmpty').style.display = 'block';
       document.getElementById('analyticsStatsRow').style.display = 'none';
-      document.querySelector('.analytics-grid').style.display = 'none';
+      if (document.querySelector('.analytics-grid')) document.querySelector('.analytics-grid').style.display = 'none';
       return;
     }
 
@@ -803,7 +803,12 @@ async function loadAnalytics() {
     renderActivityTimeline(records.slice(0, 8));
 
   } catch(err) {
-    document.getElementById('analyticsEmpty').style.display = 'block';
+    console.error('Analytics error:', err);
+    const empty = document.getElementById('analyticsEmpty');
+    if (empty) {
+      empty.style.display = 'block';
+      empty.querySelector('div:last-child').textContent = 'Error loading data: ' + err.message;
+    }
   }
 }
 
@@ -898,11 +903,11 @@ function renderTopLabelsChart(labelCount) {
   document.getElementById('labelsChart').innerHTML = html;
 
   // Animate bars
-  setTimeout(() => {
-    document.querySelectorAll('#labelsChart .label-bar-fill').forEach(bar => {
-      bar.style.width = bar.dataset.width + '%';
+  setTimeout(function() {
+    document.querySelectorAll('#labelsChart [data-width]').forEach(function(bar) {
+      bar.style.width = bar.getAttribute('data-width') + '%';
     });
-  }, 100);
+  }, 200);
 }
 
 // ── Activity Timeline ──
