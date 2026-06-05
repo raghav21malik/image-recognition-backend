@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>VisionCloud — Sign In</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --bg: #060814;
+  --surface: rgba(255,255,255,0.04);
+  --surface2: rgba(255,255,255,0.08);
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.14);
+  --accent: #6366f1;
+  --accent2: #22d3ee;
+  --accent3: #a78bfa;
+  --success: #34d399;
+  --danger: #f87171;
+  --warning: #fbbf24;
+  --text: #f1f5f9;
+  --text2: #94a3b8;
+  --text3: #475569;
+}
+[data-theme="light"] {
+  --bg: #f0f2ff;
+  --surface: rgba(255,255,255,0.85);
+  --surface2: rgba(255,255,255,0.95);
+  --border: rgba(99,102,241,0.12);
+  --border2: rgba(99,102,241,0.22);
+  --text: #0f0f1a;
+  --text2: #4b5068;
+  --text3: #8890b0;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Bricolage Grotesque', -apple-system, BlinkMacSystemFont, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  transition: background 0.3s;
+}
+.mesh-bg {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 800px 600px at 20% 20%, rgba(99,102,241,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 600px 500px at 80% 80%, rgba(34,211,238,0.09) 0%, transparent 60%);
+}
+.grid-overlay {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+.auth-wrap {
+  position: relative; z-index: 1;
+  width: 100%; max-width: 440px;
+}
+.auth-logo {
+  text-align: center; margin-bottom: 32px;
+  animation: fadeUp 0.6s ease both;
+}
+.auth-logo-icon {
+  width: 56px; height: 56px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-radius: 16px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 26px; margin-bottom: 14px;
+  box-shadow: 0 0 32px rgba(99,102,241,0.4);
+}
+.auth-logo-text {
+  font-size: 26px; font-weight: 800; letter-spacing: -0.5px;
+  color: var(--text);
+}
+.auth-logo-text span {
+  background: linear-gradient(135deg, var(--accent2), var(--accent3));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.auth-logo-sub {
+  font-size: 13px; color: var(--text2); margin-top: 4px;
+  font-family: 'DM Mono', monospace;
+}
+.auth-card {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.04);
+  animation: fadeUp 0.6s 0.1s ease both;
+  backdrop-filter: blur(12px);
+}
+/* Tabs */
+.auth-tabs {
+  display: flex; gap: 4px;
+  background: rgba(0,0,0,0.2);
+  border-radius: 12px; padding: 4px;
+  margin-bottom: 28px;
+}
+.auth-tab {
+  flex: 1; padding: 9px;
+  border: none; border-radius: 9px;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s;
+  color: var(--text2); background: none;
+}
+.auth-tab.active {
+  background: linear-gradient(135deg, rgba(99,102,241,0.25), rgba(167,139,250,0.25));
+  color: var(--accent3);
+  border: 1px solid rgba(99,102,241,0.3);
+}
+/* Form */
+.form-group { margin-bottom: 18px; }
+.form-label {
+  display: block; font-size: 12px; font-weight: 700;
+  color: var(--text2); margin-bottom: 7px;
+  font-family: 'DM Mono', monospace; letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.form-input {
+  width: 100%; padding: 12px 16px;
+  background: rgba(0,0,0,0.25);
+  border: 1px solid var(--border2);
+  border-radius: 11px; color: var(--text);
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 14px; outline: none;
+  transition: all 0.2s;
+}
+[data-theme="light"] .form-input { background: white; }
+.form-input::placeholder { color: var(--text3); }
+.form-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+}
+.form-input.error { border-color: var(--danger); }
+
+/* Password toggle */
+.input-wrap { position: relative; }
+.toggle-pw {
+  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer;
+  color: var(--text3); font-size: 16px; transition: color 0.2s;
+}
+.toggle-pw:hover { color: var(--text2); }
+
+/* Submit btn */
+.btn-submit {
+  width: 100%; padding: 14px;
+  background: linear-gradient(135deg, var(--accent), var(--accent3));
+  border: none; border-radius: 12px; color: white;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: all 0.25s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  box-shadow: 0 4px 20px rgba(99,102,241,0.3);
+  position: relative; overflow: hidden;
+  margin-top: 8px;
+}
+.btn-submit::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, var(--accent2), var(--accent));
+  opacity: 0; transition: opacity 0.3s;
+}
+.btn-submit:hover::before { opacity: 1; }
+.btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(99,102,241,0.45); }
+.btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.btn-submit span { position: relative; z-index: 1; }
+
+
+
+
+
+/* Error / success messages */
+.auth-msg {
+  padding: 11px 14px; border-radius: 10px;
+  font-size: 13px; font-weight: 600;
+  margin-bottom: 16px; display: none;
+  animation: fadeUp 0.3s ease;
+}
+.auth-msg.error { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.25); color: var(--danger); display: flex; gap: 8px; }
+.auth-msg.success { background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.25); color: var(--success); display: flex; gap: 8px; }
+
+/* Loading spinner in button */
+.btn-spinner {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white; border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: none;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
+/* Footer note */
+.auth-footer {
+  text-align: center; margin-top: 20px;
+  font-size: 12px; color: var(--text3);
+  font-family: 'DM Mono', monospace;
+  animation: fadeUp 0.6s 0.2s ease both;
+}
+
+/* Theme toggle */
+.theme-toggle-auth {
+  position: fixed; top: 20px; right: 20px; z-index: 10;
+  width: 40px; height: 40px;
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 10px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px; transition: all 0.25s;
+}
+.theme-toggle-auth:hover { transform: rotate(20deg); }
+
+/* Password strength */
+.pw-strength { margin-top: 6px; display: none; }
+.pw-strength-bar {
+  height: 3px; border-radius: 99px;
+  background: var(--border); overflow: hidden; margin-bottom: 4px;
+}
+.pw-strength-fill { height: 100%; border-radius: 99px; transition: all 0.3s; width: 0; }
+.pw-strength-text { font-size: 10px; font-family: 'DM Mono', monospace; color: var(--text3); }
+
+/* Verify email screen */
+.verify-screen {
+  text-align: center; padding: 8px 0; display: none;
+}
+.verify-icon { font-size: 52px; margin-bottom: 16px; }
+.verify-title { font-size: 20px; font-weight: 800; margin-bottom: 8px; color: var(--text); }
+.verify-desc { font-size: 13px; color: var(--text2); line-height: 1.7; font-family: 'DM Mono', monospace; }
+.verify-email-badge {
+  display: inline-block; background: rgba(99,102,241,0.1);
+  border: 1px solid rgba(99,102,241,0.2);
+  color: var(--accent3); font-family: 'DM Mono', monospace;
+  font-size: 12px; padding: 5px 14px; border-radius: 8px; margin: 12px 0;
+}
+</style>
+</head>
+<body>
+<div class="mesh-bg"></div>
+<div class="grid-overlay"></div>
+
+<button class="theme-toggle-auth" onclick="toggleTheme()" id="themeToggle" title="Toggle theme">🌙</button>
+
+<div class="auth-wrap">
+  <!-- Logo -->
+  <div class="auth-logo">
+    <div class="auth-logo-icon">🔍</div>
+    <div class="auth-logo-text">Vision<span>Cloud</span></div>
+    <div class="auth-logo-sub">AI-Powered Image Recognition</div>
+  </div>
+
+  <!-- Card -->
+  <div class="auth-card">
+
+    <!-- Tabs -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-signin" onclick="switchTab('signin')">Sign In</button>
+      <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Create Account</button>
+    </div>
+
+    <!-- Message -->
+    <div class="auth-msg" id="authMsg"></div>
+
+    <!-- Verify screen -->
+    <div class="verify-screen" id="verifyScreen">
+      <div class="verify-icon">📧</div>
+      <div class="verify-title">Check your email</div>
+      <div class="verify-desc">We sent a verification link to</div>
+      <div class="verify-email-badge" id="verifyEmail"></div>
+      <div class="verify-desc">Click the link to activate your account, then come back to sign in.</div>
+    </div>
+
+    <!-- SIGN IN FORM -->
+    <div id="signinForm">
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input class="form-input" type="email" id="signin-email" placeholder="you@example.com" autocomplete="email"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <div class="input-wrap">
+          <input class="form-input" type="password" id="signin-password" placeholder="Enter your password" autocomplete="current-password"/>
+          <button class="toggle-pw" onclick="togglePw('signin-password', this)" type="button">👁</button>
+        </div>
+      </div>
+      <button class="btn-submit" onclick="signIn()" id="signinBtn">
+        <div class="btn-spinner" id="signinSpinner"></div>
+        <span id="signinBtnText">🚀 Sign In</span>
+      </button>
+    </div>
+
+    <!-- SIGN UP FORM -->
+    <div id="signupForm" style="display:none;">
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input class="form-input" type="text" id="signup-name" placeholder="Your full name"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input class="form-input" type="email" id="signup-email" placeholder="you@example.com" autocomplete="email"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <div class="input-wrap">
+          <input class="form-input" type="password" id="signup-password" placeholder="Min 6 characters" oninput="checkStrength(this.value)" autocomplete="new-password"/>
+          <button class="toggle-pw" onclick="togglePw('signup-password', this)" type="button">👁</button>
+        </div>
+        <div class="pw-strength" id="pwStrength">
+          <div class="pw-strength-bar"><div class="pw-strength-fill" id="pwFill"></div></div>
+          <div class="pw-strength-text" id="pwText"></div>
+        </div>
+      </div>
+      <button class="btn-submit" onclick="signUp()" id="signupBtn">
+        <div class="btn-spinner" id="signupSpinner"></div>
+        <span id="signupBtnText">✨ Create Account</span>
+      </button>
+    </div>
+
+
+
+  </div>
+
+  <div class="auth-footer">
+    🔒 Secured by Supabase Auth · VisionCloud © 2026
+  </div>
+</div>
+
+<script>
+// ── CONFIG — replace these 2 values ──
+const SUPABASE_URL  = 'YOUR_SUPABASE_URL';
+const SUPABASE_ANON = 'YOUR_SUPABASE_ANON_KEY';
+const APP_URL       = 'https://raghav21malik.github.io/image-recognition-frontend/';
+
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+// ── Check if already logged in ──
+sb.auth.getSession().then(({ data }) => {
+  if (data.session) window.location.href = APP_URL;
+});
+
+// ── Tab switch ──
+function switchTab(tab) {
+  document.getElementById('signinForm').style.display  = tab === 'signin'  ? 'block' : 'none';
+  document.getElementById('signupForm').style.display  = tab === 'signup'  ? 'block' : 'none';
+  document.getElementById('tab-signin').classList.toggle('active', tab === 'signin');
+  document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
+  clearMsg();
+}
+
+// ── Sign In ──
+async function signIn() {
+  const email    = document.getElementById('signin-email').value.trim();
+  const password = document.getElementById('signin-password').value;
+  if (!email || !password) { showMsg('Please fill in all fields.', 'error'); return; }
+  setLoading('signin', true);
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+  setLoading('signin', false);
+  if (error) { showMsg(friendlyError(error.message), 'error'); return; }
+  showMsg('✅ Signed in! Redirecting...', 'success');
+  setTimeout(() => window.location.href = APP_URL, 1000);
+}
+
+// ── Sign Up ──
+async function signUp() {
+  const name     = document.getElementById('signup-name').value.trim();
+  const email    = document.getElementById('signup-email').value.trim();
+  const password = document.getElementById('signup-password').value;
+  if (!name || !email || !password) { showMsg('Please fill in all fields.', 'error'); return; }
+  if (password.length < 6) { showMsg('Password must be at least 6 characters.', 'error'); return; }
+  setLoading('signup', true);
+  const { error } = await sb.auth.signUp({
+    email, password,
+    options: { data: { full_name: name }, emailRedirectTo: APP_URL }
+  });
+  setLoading('signup', false);
+  if (error) { showMsg(friendlyError(error.message), 'error'); return; }
+  // Show verify screen
+  document.getElementById('signupForm').style.display = 'none';
+  document.getElementById('verifyScreen').style.display = 'block';
+  document.getElementById('verifyEmail').textContent = email;
+  clearMsg();
+}
+
+
+
+// ── Helpers ──
+function setLoading(form, loading) {
+  const btn     = document.getElementById(form + 'Btn');
+  const spinner = document.getElementById(form + 'Spinner');
+  const text    = document.getElementById(form + 'BtnText');
+  btn.disabled       = loading;
+  spinner.style.display = loading ? 'block' : 'none';
+  text.style.opacity = loading ? '0.5' : '1';
+}
+
+function showMsg(msg, type) {
+  const el = document.getElementById('authMsg');
+  el.textContent = msg;
+  el.className = 'auth-msg ' + type;
+}
+
+function clearMsg() {
+  const el = document.getElementById('authMsg');
+  el.className = 'auth-msg';
+}
+
+function friendlyError(msg) {
+  if (msg.includes('Invalid login')) return '❌ Wrong email or password.';
+  if (msg.includes('already registered')) return '⚠️ This email is already registered. Try signing in.';
+  if (msg.includes('not confirmed')) return '📧 Please verify your email first.';
+  if (msg.includes('rate limit')) return '⏳ Too many attempts. Wait a minute.';
+  return '❌ ' + msg;
+}
+
+function togglePw(id, btn) {
+  const input = document.getElementById(id);
+  if (input.type === 'password') { input.type = 'text'; btn.textContent = '🙈'; }
+  else { input.type = 'password'; btn.textContent = '👁'; }
+}
+
+function checkStrength(pw) {
+  const wrap = document.getElementById('pwStrength');
+  const fill = document.getElementById('pwFill');
+  const text = document.getElementById('pwText');
+  wrap.style.display = pw.length ? 'block' : 'none';
+  let score = 0;
+  if (pw.length >= 6)  score++;
+  if (pw.length >= 10) score++;
+  if (/[A-Z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+  const levels = [
+    { w:'20%', c:'#f87171', t:'Weak' },
+    { w:'40%', c:'#fbbf24', t:'Fair' },
+    { w:'60%', c:'#fbbf24', t:'Good' },
+    { w:'80%', c:'#34d399', t:'Strong' },
+    { w:'100%',c:'#34d399', t:'Very Strong' },
+  ];
+  const l = levels[Math.min(score, 4)];
+  fill.style.width = l.w; fill.style.background = l.c;
+  text.style.color = l.c; text.textContent = l.t;
+}
+
+// ── Theme ──
+function toggleTheme() {
+  const html = document.documentElement;
+  const isLight = html.getAttribute('data-theme') === 'light';
+  const t = isLight ? 'dark' : 'light';
+  html.setAttribute('data-theme', t);
+  document.getElementById('themeToggle').textContent = t === 'light' ? '🌙' : '☀️';
+  localStorage.setItem('vc-theme', t);
+}
+(function() {
+  const s = localStorage.getItem('vc-theme');
+  if (s === 'light') { document.documentElement.setAttribute('data-theme','light'); }
+})();
+
+// ── Enter key support ──
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const activeTab = document.getElementById('tab-signin').classList.contains('active');
+    if (activeTab) signIn(); else signUp();
+  }
+});
+</script>
+</body>
+</html>
