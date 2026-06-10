@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>VisionCloud — AI Image Recognition Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'"/>
+<noscript><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/></noscript>
+<link rel="stylesheet" href="style (5).css"/>
+</head>
+<body>
+<div class="page-transition" id="pageTransition"></div>
+<div class="scroll-progress" id="scrollProgress"></div>
+<div class="toast-container" id="toastContainer"></div>
+<button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top (↑)">↑</button>
+<div class="fs-overlay" id="fsOverlay" onclick="closeFsOverlay()"><span class="fs-close">✕</span><img id="fsImg" src="" alt=""/></div>
+<div class="mesh-bg"></div>
+<div class="grid-overlay"></div>
+<div class="scanlines"></div>
+<canvas class="particle-canvas" id="particleBg"></canvas>
+<div class="aurora-field" aria-hidden="true"></div>
+<div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+
+<!-- ── NAVBAR ── -->
+<nav>
+  <a class="nav-logo" href="#">
+    <div class="nav-logo-icon">🔍</div>
+    <div class="nav-logo-text">Vision<span>Cloud</span></div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#" class="active" onclick="showTab('analyze',this);return false;">⚡ Analyze</a></li>
+    <li><a href="#" onclick="showTab('history',this);return false;">🕓 History</a></li>
+    <li><a href="#" onclick="showTab('analytics',this);return false;">📊 Analytics</a></li>
+    <li><a href="architecture.html">🏗 Architecture</a></li>
+    <span class="nav-badge">LIVE</span>
+  </ul>
+  <div style="display:flex;align-items:center;gap:0;">
+    <div class="live-clock" id="liveClock"></div>
+    <div class="api-status checking" id="apiStatus"><div class="api-status-dot"></div><span id="apiStatusText">checking</span></div>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle theme (Ctrl+D)">🌙</button>
+  </div>
+</nav>
+
+<div class="main-wrap">
+
+<!-- ══════════ HERO ══════════ -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-badge"><span class="hero-badge-dot"></span><span class="typing-cursor" id="heroTyping">AI-Powered Cloud Platform</span></div>
+    <h1 class="glitch" data-text="Intelligent Image Recognition">
+      <span class="line1">Intelligent<br>Image</span><br>
+      <span class="line2">Recognition</span>
+    </h1>
+    <p class="hero-desc">Upload any image and our cloud-native AI pipeline classifies image content and generates intelligent labels using Hugging Face Vision AI — deployed on enterprise cloud infrastructure.</p>
+    <div class="hero-pills">
+      <div class="hero-pill"><span class="pill-dot" style="background:#f472b6"></span>Hugging Face Vision AI</div>
+      <div class="hero-pill"><span class="pill-dot" style="background:#22d3ee"></span>Cloudinary Storage</div>
+      <div class="hero-pill"><span class="pill-dot" style="background:#34d399"></span>Supabase Database</div>
+      <div class="hero-pill"><span class="pill-dot" style="background:#a78bfa"></span>Render Backend</div>
+    </div>
+    <div class="hero-cta">
+      <button class="btn-primary" onclick="scrollToAnalyze()"><span>🚀 Try It Now</span></button>
+      <button class="btn-secondary" onclick="runDemoScan()">Demo Scan</button>
+      <button class="btn-secondary" onclick="window.location.href='architecture.html'">🏗 View Architecture</button>
+    </div>
+    <div class="deploy-badges">
+      <div class="deploy-badge"><span class="deploy-badge-dot"></span>Frontend Online</div>
+      <div class="deploy-badge"><span class="deploy-badge-dot"></span>Backend Online</div>
+      <div class="deploy-badge"><span class="deploy-badge-dot"></span>Cloudinary Connected</div>
+      <div class="deploy-badge"><span class="deploy-badge-dot"></span>Supabase Connected</div>
+      <div class="deploy-badge"><span class="deploy-badge-dot"></span>AI Active</div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div style="position:relative;">
+      <div class="preview-float-1">✓ AI Analysis Complete</div>
+      <div class="hero-card-preview">
+        <div class="preview-top">
+          <div class="preview-dots">
+            <div class="preview-dot" style="background:#f87171"></div>
+            <div class="preview-dot" style="background:#fbbf24"></div>
+            <div class="preview-dot" style="background:#34d399"></div>
+          </div>
+          <div class="preview-title-bar"></div>
+        </div>
+        <div class="preview-img-box">🐕</div>
+        <div style="margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;">Demo Preview</span>
+          <span style="font-family:'DM Mono',monospace;font-size:10px;background:rgba(99,102,241,0.1);color:var(--accent3);padding:2px 8px;border-radius:5px;border:1px solid rgba(99,102,241,0.2);">Hugging Face AI</span>
+        </div>
+        <div class="preview-labels">
+          <div class="preview-label-row">
+            <div class="preview-label-name">Golden Retriever</div>
+            <div class="preview-label-bar-wrap"><div class="preview-label-bar" style="width:78%"></div></div>
+          </div>
+          <div class="preview-label-row">
+            <div class="preview-label-name">Labrador</div>
+            <div class="preview-label-bar-wrap"><div class="preview-label-bar" style="width:60%"></div></div>
+          </div>
+          <div class="preview-label-row">
+            <div class="preview-label-name">Dog</div>
+            <div class="preview-label-bar-wrap"><div class="preview-label-bar" style="width:45%"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="preview-float-2">☁️ Saved to Supabase</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ STATS ══════════ -->
+<section class="stats-section">
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">🖼️</div>
+      <div class="stat-value" id="stat-images">0</div>
+      <div class="stat-label">Images Processed</div>
+      <span class="stat-badge up">↑ Live</span>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🏷️</div>
+      <div class="stat-value" id="stat-labels">0</div>
+      <div class="stat-label">Labels Generated</div>
+      <span class="stat-badge up">↑ AI</span>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🗄️</div>
+      <div class="stat-value" id="stat-records">0</div>
+      <div class="stat-label">DB Records</div>
+      <span class="stat-badge up">↑ Cloud</span>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🟢</div>
+      <div class="stat-value" style="font-size:20px;-webkit-text-fill-color:var(--success);">Online</div>
+      <div class="stat-label">System Status</div>
+      <span class="stat-badge live">● Live</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ TABS ══════════ -->
+<div class="tabs-wrap">
+  <div class="tabs">
+    <button class="tab active" id="tab-btn-analyze" onclick="showTab('analyze',this)">⚡ Analyze Image</button>
+    <button class="tab" id="tab-btn-history" onclick="showTab('history',this)">🕓 Scan History</button>
+    <button class="tab" id="tab-btn-analytics" onclick="showTab('analytics',this)">📊 Analytics</button>
+  </div>
+</div>
+
+<!-- ══════════ CONTENT ══════════ -->
+<div class="content-wrap">
+
+  <!-- ANALYZE TAB -->
+  <div id="tab-analyze" class="tab-content active">
+    <div class="card" id="upload-card">
+      <div class="card-header">
+        <div class="card-title"><div class="dot"></div>Image Upload & Analysis</div>
+        <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text3)">PNG · JPG · WEBP · GIF · max 10MB</span>
+      </div>
+      <div class="card-body">
+        <div class="smart-actions" aria-label="Quick actions">
+          <button class="smart-action active" type="button" onclick="scrollToAnalyze()">Upload</button>
+          <button class="smart-action" type="button" onclick="runDemoScan()">Demo</button>
+          <button class="smart-action" type="button" onclick="showTab('history', document.getElementById('tab-btn-history'))">History</button>
+          <button class="smart-action" type="button" onclick="showTab('analytics', document.getElementById('tab-btn-analytics'))">Insights</button>
+        </div>
+        <div class="drop-zone" id="dropZone">
+          <div class="drop-icon">☁️</div>
+          <div class="drop-title">Drop your image here</div>
+          <div class="drop-sub">or <span onclick="document.getElementById('fileInput').click()">browse files</span> to upload</div>
+          <div class="drop-meta" id="dropMeta">Smart validation active</div>
+        </div>
+        <input type="file" id="fileInput" accept="image/*"/>
+        <div class="preview-wrap" id="previewWrap">
+          <img id="preview-img" src="" alt="Preview"/>
+          <div class="preview-overlay">
+            <span class="preview-filename" id="preview-filename"></span>
+            <button class="btn-remove" onclick="resetUpload()">✕ Remove</button>
+          </div>
+        </div>
+        <button class="btn-analyze" id="analyzeBtn" onclick="analyzeImage()" disabled>
+          <span>🔍 Analyze with Hugging Face AI</span>
+        </button>
+        <div style="text-align:center;margin-top:8px;" class="kbd-hint">Press <kbd class="kbd">Enter</kbd> to analyze · <kbd class="kbd">Esc</kbd> to reset · <kbd class="kbd">U</kbd> to upload</div>
+        <div class="error-box" id="errorBox"></div>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-wrap" id="loadingWrap">
+      <div class="spinner-ring"></div>
+      <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px">Processing with Cloud AI...</div>
+      <div style="font-size:12px;color:var(--text3);font-family:'DM Mono',monospace;">Uploading → Analyzing → Saving</div>
+      <div class="loading-steps">
+        <div class="loading-step" id="step1"><div class="step-icon">☁️</div><span>Cloudinary</span></div>
+        <div class="loading-step" id="step2"><div class="step-icon">🤗</div><span>Hugging Face</span></div>
+        <div class="loading-step" id="step3"><div class="step-icon">🗄️</div><span>Supabase</span></div>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div class="results-wrap" id="resultsWrap"></div>
+  </div>
+
+  <!-- HISTORY TAB -->
+  <div id="tab-history" class="tab-content">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><div class="dot"></div>Scan History</div>
+        <button onclick="loadHistory()" style="background:var(--surface);border:1px solid var(--border);color:var(--text2);font-size:12px;padding:6px 14px;border-radius:8px;cursor:pointer;font-family:'Bricolage Grotesque',sans-serif;font-weight:600;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">↻ Refresh</button>
+      </div>
+      <div class="card-body">
+        <div class="history-toolbar">
+          <input class="search-box" type="text" id="searchBox" placeholder="🔍  Search by filename..." oninput="filterHistory()"/>
+          <input class="filter-input" type="text" id="filterLabel" placeholder="Filter by label..." oninput="filterHistory()"/>
+          <select class="sort-select" id="sortSelect" onchange="filterHistory()">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+          </select>
+        </div>
+        <div id="historyBody">
+          <div class="empty-state"><div class="icon">⏳</div><div>Loading history...</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYTICS TAB -->
+  <div id="tab-analytics" class="tab-content">
+    <div id="analytics-section">
+
+      <!-- Stats row -->
+      <div class="analytics-stats-row" id="analyticsStatsRow">
+        <div class="an-stat-card">
+          <div class="an-stat-icon">🖼️</div>
+          <div class="an-stat-value" id="an-total">—</div>
+          <div class="an-stat-label">Total Scans</div>
+        </div>
+        <div class="an-stat-card">
+          <div class="an-stat-icon">🏷️</div>
+          <div class="an-stat-value" id="an-labels">—</div>
+          <div class="an-stat-label">Labels Generated</div>
+        </div>
+        <div class="an-stat-card">
+          <div class="an-stat-icon">⚡</div>
+          <div class="an-stat-value" id="an-today">—</div>
+          <div class="an-stat-label">Images Scanned Today</div>
+        </div>
+        <div class="an-stat-card">
+          <div class="an-stat-icon">🏆</div>
+          <div class="an-stat-value" id="an-top-label" style="font-size:16px;">—</div>
+          <div class="an-stat-label">Most Common Label</div>
+        </div>
+      </div>
+
+      <!-- Charts grid -->
+      <div class="analytics-grid">
+
+        <!-- Scans per day chart -->
+        <div class="card analytics-card">
+          <div class="card-header">
+            <div class="card-title"><div class="dot"></div>Scans Per Day</div>
+            <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text3)">Last 7 days</span>
+          </div>
+          <div class="card-body">
+            <div class="chart-wrap" id="scansChart"></div>
+          </div>
+        </div>
+
+        <!-- Top labels chart -->
+        <div class="card analytics-card">
+          <div class="card-header">
+            <div class="card-title"><div class="dot"></div>Top Detected Labels</div>
+            <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text3)">Most frequent</span>
+          </div>
+          <div class="card-body">
+            <div id="labelsChart"></div>
+          </div>
+        </div>
+
+        <!-- Activity timeline -->
+        <div class="card analytics-card full-width-card">
+          <div class="card-header">
+            <div class="card-title"><div class="dot"></div>Recent Activity Timeline</div>
+          </div>
+          <div class="card-body">
+            <div id="activityTimeline"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Empty state -->
+      <div id="analyticsEmpty" style="display:none;">
+        <div class="empty-state">
+          <div class="icon">📊</div>
+          <div>No data yet — upload some images first!</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /content-wrap -->
+
+</div><!-- /main-wrap -->
+
+<!-- ══════════ FOOTER ══════════ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="logo">
+        <div class="logo-icon">🔍</div>
+        <div class="logo-text">VisionCloud</div>
+      </div>
+      <p>A cloud-native AI image recognition platform built as a demonstration of full-stack cloud computing, AI integration, and modern deployment practices.</p>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Project Team</div>
+      <span class="accent" style="font-size:18px;font-weight:800;letter-spacing:-0.5px;">Raghav Malik</span>
+      <span style="margin-top:4px;">B.Tech Computer Science</span>
+      <span>Cloud Computing Specialization</span>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+        <span style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;letter-spacing:1px;text-transform:uppercase;">Guided By</span>
+        <span class="accent" style="font-size:15px;font-weight:700;margin-top:4px;">A Sai Venkateshwar Rao</span>
+        <span>Project Mentor</span>
+      </div>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Technology Stack</div>
+      <div class="footer-tags">
+        <span class="footer-tag">HTML/CSS/JS</span>
+        <span class="footer-tag">Python Flask</span>
+        <span class="footer-tag">Cloudinary</span>
+        <span class="footer-tag">Supabase</span>
+        <span class="footer-tag">Hugging Face</span>
+        <span class="footer-tag">Render</span>
+        <span class="footer-tag">GitHub Pages</span>
+        <span class="footer-tag">REST API</span>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 VisionCloud · Built by Raghav Malik · Guided by A Sai Venkateshwar Rao</span>
+    <span>Cloud Computing Project · B.Tech CSE</span>
+  </div>
+</footer>
+
+<!-- ══════════ MODAL ══════════ -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="card-title" id="modal-title">Scan Details</div>
+      <button class="modal-close" onclick="document.getElementById('modalOverlay').classList.remove('visible')">✕</button>
+    </div>
+    <img class="modal-img" id="modal-img" src="" alt="" style="display:none"/>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- ══════════ COMMAND PALETTE ══════════ -->
+<div class="cmd-palette" id="cmdPalette" onclick="if(event.target===this)closeCmdPalette()">
+  <div class="cmd-palette-box">
+    <div class="cmd-input-wrap">
+      <span class="cmd-input-icon">⌘</span>
+      <input class="cmd-input" id="cmdInput" type="text" placeholder="Type a command..." autocomplete="off"/>
+      <kbd class="cmd-esc">ESC</kbd>
+    </div>
+    <div class="cmd-divider"></div>
+    <div class="cmd-results" id="cmdResults"></div>
+  </div>
+</div>
+
+<!-- ══════════ FAB ══════════ -->
+<button class="fab-btn" id="fabBtn" onclick="toggleFabMenu()" title="Quick Actions">⚡</button>
+<div class="fab-menu" id="fabMenu">
+  <button onclick="scrollToAnalyze();toggleFabMenu()" class="fab-item">📤 Upload</button>
+  <button onclick="runDemoScan();toggleFabMenu()" class="fab-item">🎯 Demo</button>
+  <button onclick="showTab('history',document.getElementById('tab-btn-history'));toggleFabMenu()" class="fab-item">🕓 History</button>
+  <button onclick="window.location.href='architecture.html'" class="fab-item">🏗 Architecture</button>
+</div>
+
+<script src="script (7).js"></script>
+</body>
+</html>
