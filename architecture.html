@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>VisionCloud — Architecture & Project Details</title>
+<meta name="description" content="System architecture, project details, and credits for VisionCloud AI Image Recognition Platform">
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'"/>
+<noscript><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/></noscript>
+<link rel="stylesheet" href="style (5).css"/>
+<style>
+/* ═══════ ARCHITECTURE PAGE HERO ═══════ */
+.arch-page-hero {
+  text-align: center;
+  padding: 100px 24px 60px;
+  position: relative;
+}
+.arch-page-hero h1 {
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  font-weight: 800;
+  letter-spacing: -1.5px;
+  line-height: 1.15;
+  margin-bottom: 20px;
+}
+.arch-page-hero .hero-desc {
+  font-size: 16px;
+  color: var(--text2);
+  line-height: 1.7;
+}
+
+/* ═══════ MENTOR / CREDITS ═══════ */
+.mentor-section {
+  padding: 80px 24px;
+  text-align: center;
+}
+.credits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 32px;
+  max-width: 920px;
+  margin: 48px auto 0;
+}
+.mentor-card {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 40px 32px 36px;
+  text-align: center;
+  overflow: hidden;
+  transition: transform 0.35s cubic-bezier(.4,0,.2,1), box-shadow 0.35s cubic-bezier(.4,0,.2,1), border-color 0.35s;
+}
+.mentor-card:hover {
+  transform: translateY(-6px) scale(1.015);
+  box-shadow: 0 24px 64px rgba(0,0,0,0.25);
+}
+.mentor-card-glow {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+.mentor-card:hover .mentor-card-glow {
+  opacity: 1;
+}
+
+/* ── Mentor variant (golden/amber) ── */
+.mentor-card.mentor {
+  border-color: rgba(251,191,36,0.25);
+}
+.mentor-card.mentor:hover {
+  border-color: rgba(251,191,36,0.5);
+  box-shadow: 0 24px 64px rgba(251,191,36,0.12), 0 0 40px rgba(251,191,36,0.08);
+}
+.mentor-card.mentor .mentor-card-glow {
+  background: radial-gradient(circle at 50% 50%, rgba(251,191,36,0.06) 0%, transparent 70%);
+}
+.mentor-card.mentor .mentor-card-avatar {
+  background: linear-gradient(135deg, #f59e0b, #d97706, #b45309);
+  box-shadow: 0 8px 32px rgba(245,158,11,0.35), 0 0 60px rgba(251,191,36,0.15);
+}
+.mentor-card.mentor .mentor-card-badge {
+  background: rgba(251,191,36,0.1);
+  color: #fbbf24;
+  border: 1px solid rgba(251,191,36,0.25);
+}
+.mentor-card.mentor .mentor-tag {
+  background: rgba(251,191,36,0.08);
+  color: #fbbf24;
+  border: 1px solid rgba(251,191,36,0.18);
+}
+
+/* ── Developer variant (indigo/cyan) ── */
+.mentor-card.developer {
+  border-color: rgba(99,102,241,0.25);
+}
+.mentor-card.developer:hover {
+  border-color: rgba(99,102,241,0.5);
+  box-shadow: 0 24px 64px rgba(99,102,241,0.12), 0 0 40px rgba(99,102,241,0.08);
+}
+.mentor-card.developer .mentor-card-glow {
+  background: radial-gradient(circle at 50% 50%, rgba(99,102,241,0.06) 0%, transparent 70%);
+}
+.mentor-card.developer .mentor-card-avatar {
+  background: linear-gradient(135deg, #6366f1, #818cf8, #22d3ee);
+  box-shadow: 0 8px 32px rgba(99,102,241,0.35), 0 0 60px rgba(34,211,238,0.15);
+}
+.mentor-card.developer .mentor-card-badge {
+  background: rgba(99,102,241,0.1);
+  color: #818cf8;
+  border: 1px solid rgba(99,102,241,0.25);
+}
+.mentor-card.developer .mentor-tag {
+  background: rgba(99,102,241,0.08);
+  color: #818cf8;
+  border: 1px solid rgba(99,102,241,0.18);
+}
+
+/* ── Card internals ── */
+.mentor-card-badge {
+  display: inline-block;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  padding: 5px 14px;
+  border-radius: 20px;
+  margin-bottom: 24px;
+}
+.mentor-card-avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 1px;
+  position: relative;
+  animation: avatarPulse 4s ease-in-out infinite;
+}
+@keyframes avatarPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+.mentor-card-avatar::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.08);
+  animation: avatarRing 6s linear infinite;
+}
+@keyframes avatarRing {
+  0% { transform: rotate(0deg); border-color: rgba(255,255,255,0.08); }
+  50% { border-color: rgba(255,255,255,0.18); }
+  100% { transform: rotate(360deg); border-color: rgba(255,255,255,0.08); }
+}
+.mentor-card-name {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.5px;
+  margin-bottom: 4px;
+}
+.mentor-card-role {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--text3);
+  letter-spacing: 0.5px;
+  margin-bottom: 16px;
+}
+.mentor-card-desc {
+  font-size: 14px;
+  color: var(--text2);
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+.mentor-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+.mentor-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+/* ═══════ RESPONSIVE ═══════ */
+@media (max-width: 700px) {
+  .credits-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .mentor-card {
+    padding: 32px 20px 28px;
+  }
+  .mentor-card-avatar {
+    width: 80px;
+    height: 80px;
+    font-size: 24px;
+  }
+  .arch-page-hero {
+    padding: 80px 16px 40px;
+  }
+}
+</style>
+</head>
+<body>
+<div class="scroll-progress" id="scrollProgress"></div>
+<div class="toast-container" id="toastContainer"></div>
+<button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top (↑)">↑</button>
+<div class="mesh-bg"></div>
+<div class="grid-overlay"></div>
+<div class="aurora-field" aria-hidden="true"></div>
+<div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+<div class="scanlines"></div>
+<canvas class="particle-canvas" id="particleBg"></canvas>
+
+<!-- ── NAVBAR ── -->
+<nav>
+  <a class="nav-logo" href="index (10).html">
+    <div class="nav-logo-icon">🔍</div>
+    <div class="nav-logo-text">Vision<span>Cloud</span></div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index (10).html">⚡ Analyze</a></li>
+    <li><a href="#" class="active">🏗 Architecture</a></li>
+    <span class="nav-badge">LIVE</span>
+  </ul>
+  <div style="display:flex;align-items:center;gap:0;">
+    <div class="live-clock" id="liveClock"></div>
+    <div class="api-status checking" id="apiStatus"><div class="api-status-dot"></div><span id="apiStatusText">checking</span></div>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle theme (Ctrl+D)">🌙</button>
+  </div>
+</nav>
+
+<div class="main-wrap">
+
+<!-- ══════════ ARCHITECTURE PAGE HERO ══════════ -->
+<section class="arch-page-hero">
+  <div class="hero-badge"><span class="hero-badge-dot"></span>System Overview</div>
+  <h1 class="glitch" data-text="Architecture & Project Details">
+    <span class="line1">Architecture &</span><br>
+    <span class="line2">Project Details</span>
+  </h1>
+  <p class="hero-desc" style="max-width:680px;margin:0 auto;">A deep dive into VisionCloud's cloud-native architecture, technology decisions, and the team behind this AI-powered platform.</p>
+</section>
+
+<!-- ══════════ CLOUD ARCHITECTURE ══════════ -->
+<section class="arch-section" id="arch-section">
+  <div class="section-label">System Design</div>
+  <div class="section-heading">Cloud Architecture</div>
+  <div class="section-sub">A fully cloud-native pipeline — every layer runs on a separate managed cloud service, mirroring real enterprise architecture.</div>
+
+  <div class="arch-diagram">
+    <div class="arch-flow">
+
+      <div class="arch-node" style="border-color:rgba(99,102,241,0.35);">
+        <div class="arch-node-icon" style="background:linear-gradient(135deg,rgba(99,102,241,0.15),rgba(167,139,250,0.15));">👤</div>
+        <div class="arch-node-body">
+          <div class="arch-node-title">User / Browser</div>
+          <div class="arch-node-desc">Uploads image via drag & drop · Receives AI results in real-time</div>
+        </div>
+        <span class="arch-node-badge" style="background:rgba(99,102,241,0.1);color:var(--accent3);border:1px solid rgba(99,102,241,0.2);">CLIENT</span>
+      </div>
+      <div class="arch-arrow"><div class="arch-arrow-line"></div></div>
+
+      <div class="arch-node" style="border-color:rgba(52,211,153,0.3);">
+        <div class="arch-node-icon" style="background:linear-gradient(135deg,rgba(52,211,153,0.1),rgba(34,211,238,0.1));">🌐</div>
+        <div class="arch-node-body">
+          <div class="arch-node-title">Frontend — GitHub Pages</div>
+          <div class="arch-node-desc">HTML · CSS · JavaScript · Hosted on GitHub CDN · Zero server cost</div>
+        </div>
+        <span class="arch-node-badge" style="background:rgba(52,211,153,0.1);color:var(--success);border:1px solid rgba(52,211,153,0.2);">STATIC HOST</span>
+      </div>
+      <div class="arch-arrow"><div class="arch-arrow-line"></div></div>
+
+      <div class="arch-node" style="border-color:rgba(251,191,36,0.3);">
+        <div class="arch-node-icon" style="background:linear-gradient(135deg,rgba(251,191,36,0.1),rgba(248,113,113,0.1));">⚙️</div>
+        <div class="arch-node-body">
+          <div class="arch-node-title">Backend API — Render</div>
+          <div class="arch-node-desc">Python Flask · REST API · Orchestrates all 3 cloud services · Gunicorn WSGI</div>
+        </div>
+        <span class="arch-node-badge" style="background:rgba(251,191,36,0.1);color:var(--warning);border:1px solid rgba(251,191,36,0.2);">CLOUD BACKEND</span>
+      </div>
+
+      <!-- 3-way split -->
+      <div class="arch-split">
+        <div class="arch-split-item">
+          <div class="arch-split-line"></div>
+          <div class="arch-split-node" style="border-color:rgba(34,211,238,0.25);">
+            <div class="arch-split-icon">🖼️</div>
+            <div class="arch-split-title">Cloudinary</div>
+            <div class="arch-split-desc">Cloud Image Storage · CDN · Auto-optimize</div>
+          </div>
+        </div>
+        <div class="arch-split-item">
+          <div class="arch-split-line"></div>
+          <div class="arch-split-node" style="border-color:rgba(244,114,182,0.25);">
+            <div class="arch-split-icon">🤗</div>
+            <div class="arch-split-title">Hugging Face</div>
+            <div class="arch-split-desc">Vision AI Model · Labels · Objects · OCR</div>
+          </div>
+        </div>
+        <div class="arch-split-item">
+          <div class="arch-split-line"></div>
+          <div class="arch-split-node" style="border-color:rgba(52,211,153,0.25);">
+            <div class="arch-split-icon">🗄️</div>
+            <div class="arch-split-title">Supabase</div>
+            <div class="arch-split-desc">PostgreSQL DB · Scan History · REST API</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="tech-grid">
+    <div class="tech-card"><div class="tech-icon">🐍</div><div class="tech-name">Python Flask</div><div class="tech-role">Backend API</div></div>
+    <div class="tech-card"><div class="tech-icon">🌐</div><div class="tech-name">GitHub Pages</div><div class="tech-role">Frontend Host</div></div>
+    <div class="tech-card"><div class="tech-icon">⚡</div><div class="tech-name">Render</div><div class="tech-role">Cloud Backend</div></div>
+    <div class="tech-card"><div class="tech-icon">🖼️</div><div class="tech-name">Cloudinary</div><div class="tech-role">Image Storage</div></div>
+    <div class="tech-card"><div class="tech-icon">🤗</div><div class="tech-name">Hugging Face</div><div class="tech-role">Vision AI</div></div>
+    <div class="tech-card"><div class="tech-icon">🗄️</div><div class="tech-name">Supabase</div><div class="tech-role">PostgreSQL DB</div></div>
+  </div>
+</section>
+
+<!-- ══════════ AI MODEL INFORMATION ══════════ -->
+<section class="model-section">
+  <div class="section-label">Under the Hood</div>
+  <div class="section-heading">AI Model Information</div>
+  <div class="section-sub">Production-grade Vision AI running on managed cloud infrastructure.</div>
+  <div class="model-grid">
+    <div class="model-card">
+      <div class="model-card-icon">🤗</div>
+      <div class="model-card-label">Model ID</div>
+      <div class="model-card-value">google/vit-base-patch16-224</div>
+      <span class="model-card-badge">Vision Transformer</span>
+    </div>
+    <div class="model-card">
+      <div class="model-card-icon">☁️</div>
+      <div class="model-card-label">Provider</div>
+      <div class="model-card-value">Hugging Face Inference API</div>
+      <span class="model-card-badge">Managed Cloud</span>
+    </div>
+    <div class="model-card">
+      <div class="model-card-icon">🔬</div>
+      <div class="model-card-label">Task Type</div>
+      <div class="model-card-value">Image Classification</div>
+      <span class="model-card-badge">Computer Vision</span>
+    </div>
+    <div class="model-card">
+      <div class="model-card-icon">⚡</div>
+      <div class="model-card-label">Deployment</div>
+      <div class="model-card-value">Cloud API via REST</div>
+      <span class="model-card-badge">Serverless</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ PROJECT HIGHLIGHTS ══════════ -->
+<section class="highlights-section" id="highlights-section">
+  <div class="section-label">Project Features</div>
+  <div class="section-heading">Project Highlights</div>
+  <div class="section-sub">A production-grade cloud architecture demonstrating full-stack development, AI integration, and modern deployment practices.</div>
+
+  <div class="highlights-grid">
+    <div class="highlight-card">
+      <div class="highlight-check">✓</div>
+      <div class="highlight-icon">☁️</div>
+      <div class="highlight-title">Cloud Storage Integration</div>
+      <div class="highlight-desc">Images persisted to Cloudinary CDN with auto-optimization and format conversion</div>
+    </div>
+    <div class="highlight-card">
+      <div class="highlight-check">✓</div>
+      <div class="highlight-icon">🤖</div>
+      <div class="highlight-title">AI Image Classification</div>
+      <div class="highlight-desc">Hugging Face Vision model returns labels, objects, text and confidence scores</div>
+    </div>
+    <div class="highlight-card">
+      <div class="highlight-check">✓</div>
+      <div class="highlight-icon">⚙️</div>
+      <div class="highlight-title">REST API Architecture</div>
+      <div class="highlight-desc">Python Flask backend with clean endpoints for upload and history retrieval</div>
+    </div>
+    <div class="highlight-card">
+      <div class="highlight-check">✓</div>
+      <div class="highlight-icon">🗄️</div>
+      <div class="highlight-title">Database Logging</div>
+      <div class="highlight-desc">Every scan persisted to Supabase PostgreSQL with full metadata and AI results</div>
+    </div>
+    <div class="highlight-card">
+      <div class="highlight-check">✓</div>
+      <div class="highlight-icon">📱</div>
+      <div class="highlight-title">Responsive Design</div>
+      <div class="highlight-desc">Fully mobile-responsive UI with smooth animations and modern glassmorphism</div>
+    </div>
+    <div class="highlight-card">
+      <div class="highlight-check">✓</div>
+      <div class="highlight-icon">🔗</div>
+      <div class="highlight-title">Full Stack Development</div>
+      <div class="highlight-desc">End-to-end from frontend HTML/JS to Python backend and cloud databases</div>
+    </div>
+    <div class="highlight-card">
+      <div class="highlight-check">✓</div>
+      <div class="highlight-icon">🚀</div>
+      <div class="highlight-title">Cloud Deployment</div>
+      <div class="highlight-desc">Backend on Render, frontend on GitHub Pages — fully deployed and publicly accessible</div>
+    </div>
+    <div class="highlight-card">
+      <div class="highlight-check">✓</div>
+      <div class="highlight-icon">⚡</div>
+      <div class="highlight-title">Real-Time Processing</div>
+      <div class="highlight-desc">Instant AI inference pipeline with live loading states and animated results</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ PROBLEM & SOLUTION ══════════ -->
+<section class="problem-section">
+  <div class="section-label">Why This Exists</div>
+  <div class="section-heading">Problem &amp; Solution</div>
+  <div class="section-sub">A real-world challenge solved with cloud AI infrastructure.</div>
+  <div class="problem-grid">
+    <div class="problem-card problem">
+      <div class="problem-card-icon">⚠️</div>
+      <div class="problem-card-type">Problem Statement</div>
+      <div class="problem-card-title">Manual Image Identification</div>
+      <div class="problem-card-text">Manual image identification is slow, inconsistent, and error-prone at scale. Humans struggle to classify thousands of images accurately and quickly, and there's no structured way to store, search, or revisit those results.</div>
+    </div>
+    <div class="problem-card solution">
+      <div class="problem-card-icon">✅</div>
+      <div class="problem-card-type">Solution</div>
+      <div class="problem-card-title">AI-Powered Cloud Pipeline</div>
+      <div class="problem-card-text">An AI-powered cloud application that automatically analyzes uploaded images, classifies content using Vision AI, stores results in cloud storage, and maintains a searchable scan history — all in real time with zero manual effort.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ MENTOR & CREDITS ══════════ -->
+<section class="mentor-section" id="credits-section">
+  <div class="section-label">Acknowledgements</div>
+  <div class="section-heading">Guided By Excellence</div>
+  <div class="section-sub">This project was built under expert mentorship and represents a culmination of cloud computing knowledge and modern development practices.</div>
+
+  <div class="credits-grid">
+    <!-- MENTOR CARD -->
+    <div class="mentor-card mentor">
+      <div class="mentor-card-glow"></div>
+      <div class="mentor-card-badge">🎓 Project Mentor</div>
+      <div class="mentor-card-avatar">
+        <span>ASV</span>
+      </div>
+      <div class="mentor-card-name">A Sai Venkateshwar Rao</div>
+      <div class="mentor-card-role">Project Guide & Mentor</div>
+      <div class="mentor-card-desc">Under the expert guidance of Prof. A Sai Venkateshwar Rao, this project explores the intersection of cloud computing, artificial intelligence, and modern web development — transforming theoretical concepts into a production-grade cloud application.</div>
+      <div class="mentor-card-tags">
+        <span class="mentor-tag">Cloud Computing</span>
+        <span class="mentor-tag">AI/ML</span>
+        <span class="mentor-tag">Project Guidance</span>
+      </div>
+    </div>
+
+    <!-- DEVELOPER CARD -->
+    <div class="mentor-card developer">
+      <div class="mentor-card-glow"></div>
+      <div class="mentor-card-badge">💻 Developer</div>
+      <div class="mentor-card-avatar">
+        <span>RM</span>
+      </div>
+      <div class="mentor-card-name">Raghav Malik</div>
+      <div class="mentor-card-role">Full-Stack Developer</div>
+      <div class="mentor-card-desc">Designed and developed the complete VisionCloud platform — from the futuristic frontend interface to the Python Flask backend, cloud service integrations, and AI pipeline — as a B.Tech Computer Science project with Cloud Computing specialization.</div>
+      <div class="mentor-card-tags">
+        <span class="mentor-tag">Full-Stack</span>
+        <span class="mentor-tag">Cloud Architecture</span>
+        <span class="mentor-tag">AI Integration</span>
+        <span class="mentor-tag">UI/UX Design</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div><!-- /main-wrap -->
+
+<!-- ══════════ FOOTER ══════════ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="logo">
+        <div class="logo-icon">🔍</div>
+        <div class="logo-text">VisionCloud</div>
+      </div>
+      <p>A cloud-native AI image recognition platform built as a demonstration of full-stack cloud computing, AI integration, and modern deployment practices.</p>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Built By</div>
+      <span class="accent" style="font-size:18px;font-weight:800;letter-spacing:-0.5px;">Raghav Malik</span>
+      <span style="margin-top:4px;">B.Tech Computer Science</span>
+      <span>Cloud Computing Specialization</span>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Guided By</div>
+      <span class="accent" style="font-size:18px;font-weight:800;letter-spacing:-0.5px;">A Sai Venkateshwar Rao</span>
+      <span style="margin-top:4px;">Project Mentor</span>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Technology Stack</div>
+      <div class="footer-tags">
+        <span class="footer-tag">HTML/CSS/JS</span>
+        <span class="footer-tag">Python Flask</span>
+        <span class="footer-tag">Cloudinary</span>
+        <span class="footer-tag">Supabase</span>
+        <span class="footer-tag">Hugging Face</span>
+        <span class="footer-tag">Render</span>
+        <span class="footer-tag">GitHub Pages</span>
+        <span class="footer-tag">REST API</span>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 VisionCloud · Built by Raghav Malik · Guided by A Sai Venkateshwar Rao</span>
+    <span>Cloud Computing Project · B.Tech CSE</span>
+  </div>
+</footer>
+
+<script src="script (7).js"></script>
+</body>
+</html>
