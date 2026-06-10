@@ -58,7 +58,7 @@ def upload_image():
                 user_response = supabase.auth.get_user(token)
                 user_id = user_response.user.id
             except Exception:
-                pass  # Auth optional — still works without login
+                pass
 
         # ── Upload image to Cloudinary ───────────────────────────
         upload_result = cloudinary.uploader.upload(file)
@@ -80,14 +80,18 @@ def upload_image():
         hf_result = hf_response.json()
         print("HF RESULT:", hf_result)
 
+        # ── Parse labels WITH confidence scores ──────────────────
         labels = []
         if isinstance(hf_result, list):
             labels = [
-                item.get("label")
+                {
+                    "name":       item.get("label", "Unknown"),
+                    "confidence": round(item.get("score", 0) * 100, 2)
+                }
                 for item in hf_result[:5]
             ]
 
-        # ── Save to Supabase (with user_id if authenticated) ──────
+        # ── Save to Supabase ──────────────────────────────────────
         db_data = {
             "filename":        file.filename,
             "image_url":       img_url,
@@ -101,7 +105,7 @@ def upload_image():
             "detected_text":   None,
             "landmark":        None,
             "dominant_colors": [],
-            "user_id":         user_id   # None if not logged in
+            "user_id":         user_id
         }
 
         supabase.table("scan_history").insert(db_data).execute()
