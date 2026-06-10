@@ -33,6 +33,7 @@
     <li><a href="#" class="active" onclick="showTab('analyze',this);return false;">⚡ Analyze</a></li>
     <li><a href="#" onclick="showTab('history',this);return false;">🕓 History</a></li>
     <li><a href="#" onclick="showTab('analytics',this);return false;">📊 Analytics</a></li>
+    <li><a href="#" onclick="showTab('benchmark',this);return false;">🏆 Benchmark</a></li>
     <li><a href="architecture.html">🏗 Architecture</a></li>
     <span class="nav-badge">LIVE</span>
   </ul>
@@ -146,6 +147,7 @@
     <button class="tab active" id="tab-btn-analyze" onclick="showTab('analyze',this)">⚡ Analyze Image</button>
     <button class="tab" id="tab-btn-history" onclick="showTab('history',this)">🕓 Scan History</button>
     <button class="tab" id="tab-btn-analytics" onclick="showTab('analytics',this)">📊 Analytics</button>
+    <button class="tab" id="tab-btn-benchmark" onclick="showTab('benchmark',this)">🏆 Benchmark</button>
   </div>
 </div>
 
@@ -300,6 +302,59 @@
         </div>
       </div>
 
+    </div>
+  </div>
+
+  <!-- BENCHMARK TAB -->
+  <div id="tab-benchmark" class="tab-content">
+    <div class="card" id="benchmark-card">
+      <div class="card-header">
+        <div class="card-title"><div class="dot"></div>Multi-Model Benchmark</div>
+        <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text3)">5 models · parallel inference</span>
+      </div>
+      <div class="card-body">
+
+        <!-- Step 1: Upload or use existing -->
+        <div id="benchmark-upload-section">
+          <div style="text-align:center;padding:20px 0 12px;">
+            <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">Upload an image to benchmark across all 5 AI models</div>
+            <div style="font-size:12px;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:20px;">All models run simultaneously — results appear in seconds</div>
+          </div>
+
+          <div class="drop-zone" id="benchmarkDropZone" onclick="document.getElementById('benchmarkFileInput').click()">
+            <div class="drop-icon">🏆</div>
+            <div class="drop-title">Drop image to benchmark</div>
+            <div class="drop-sub">or <span>browse files</span></div>
+          </div>
+          <input type="file" id="benchmarkFileInput" accept="image/*" onchange="handleBenchmarkFile(this.files[0])"/>
+
+          <div class="benchmark-preview-wrap" id="benchmarkPreviewWrap" style="display:none;">
+            <img id="benchmark-preview-img" src="" alt="Preview" style="width:100%;max-height:220px;object-fit:cover;border-radius:12px;margin-bottom:12px;"/>
+            <button class="btn-analyze" id="benchmarkRunBtn" onclick="runBenchmark()" style="background:linear-gradient(135deg,#f472b6,#6366f1,#22d3ee);">
+              <span>🏆 Run Benchmark — 5 Models</span>
+            </button>
+            <div style="text-align:center;margin-top:8px;font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;">All 5 models run in parallel · ~5-10 seconds</div>
+          </div>
+        </div>
+
+        <!-- Loading -->
+        <div id="benchmark-loading" style="display:none;text-align:center;padding:32px 0;">
+          <div class="spinner-ring" style="margin:0 auto 16px;"></div>
+          <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;">Running 5 models simultaneously...</div>
+          <div style="font-size:12px;color:var(--text3);font-family:'DM Mono',monospace;">ViT · ResNet · EfficientNet · ConvNeXt · BEiT</div>
+          <div class="benchmark-progress" id="benchmarkProgress">
+            <div class="bm-prog-item" id="bm-prog-0">⏳ ViT-Base</div>
+            <div class="bm-prog-item" id="bm-prog-1">⏳ ResNet-50</div>
+            <div class="bm-prog-item" id="bm-prog-2">⏳ EfficientNet</div>
+            <div class="bm-prog-item" id="bm-prog-3">⏳ ConvNeXt</div>
+            <div class="bm-prog-item" id="bm-prog-4">⏳ BEiT-Base</div>
+          </div>
+        </div>
+
+        <!-- Results -->
+        <div id="benchmark-results" style="display:none;"></div>
+
+      </div>
     </div>
   </div>
 
