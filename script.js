@@ -561,7 +561,10 @@ function renderHistory(records) {
     html += `</div>
       <div class="history-footer">
         <div class="history-time">🕓 ${date}</div>
-        ${r.image_url ? `<a class="history-cloud-link" href="${r.image_url}" target="_blank" onclick="event.stopPropagation()">☁️ Open ↗</a>` : ''}
+        <div style="display:flex;gap:6px;align-items:center;">
+          ${r.image_url ? `<a class="history-cloud-link" href="${r.image_url}" target="_blank" onclick="event.stopPropagation()">☁️ Open ↗</a>` : ''}
+          <button class="history-delete-btn" onclick="event.stopPropagation();deleteRecord(${r.id})" title="Delete this scan">🗑️</button>
+        </div>
       </div>
     </div></div>`;
   });
@@ -1476,4 +1479,70 @@ function initPageTransition() {
       setTimeout(() => window.location.href = href, 400);
     });
   });
+}
+
+// ══════════════════════════════════════
+// DELETE SCAN RECORD
+// ══════════════════════════════════════
+async function deleteRecord(id) {
+  if (!confirm('Delete this scan? This cannot be undone.')) return;
+
+  try {
+    const authHeaders = await getAuthHeaders();
+
+    // Delete from Supabase via backend
+    const res = await fetch(`${BACKEND}/api/history/${id}`, {
+      method: 'DELETE',
+      headers: authHeaders
+    });
+
+    if (res.ok) {
+      // Remove from local array
+      allHistory = allHistory.filter(r => r.id !== id);
+      renderHistory(allHistory);
+      showToast('Scan deleted successfully', 'success');
+
+      // Update stats
+      loadStats();
+    } else {
+      // If backend delete not yet implemented, delete directly via Supabase
+      const SUPABASE_URL  = document.querySelector('[data-sburl]')?.dataset?.sburl || window.SUPABASE_URL;
+      const SUPABASE_ANON = document.querySelector('[data-sbkey]')?.dataset?.sbkey  || window.SUPABASE_ANON;
+
+      if (sbClient) {
+        const { error } = await sbClient
+          .from('scan_history')
+          .delete()
+          .eq('id', id);
+
+        if (!error) {
+          allHistory = allHistory.filter(r => r.id !== id);
+          renderHistory(allHistory);
+          showToast('Scan deleted successfully', 'success');
+          loadStats();
+        } else {
+          showToast('Delete failed: ' + error.message, 'error');
+        }
+      } else {
+        showToast('Could not delete. Please try again.', 'error');
+      }
+    }
+  } catch(err) {
+    // Fallback: use Supabase client directly
+    if (typeof sbClient !== 'undefined' && sbClient) {
+      const { error } = await sbClient
+        .from('scan_history')
+        .delete()
+        .eq('id', id);
+
+      if (!error) {
+        allHistory = allHistory.filter(r => r.id !== id);
+        renderHistory(allHistory);
+        showToast('Scan deleted!', 'success');
+        loadStats();
+      } else {
+        showToast('Delete failed.', 'error');
+      }
+    }
+  }
 }
