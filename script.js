@@ -302,8 +302,8 @@ function parseResponse(data) {
   let labels = ai.labels || ai.tags || ai.classifications || [];
   if (!Array.isArray(labels)) labels = [];
   labels = labels.map(l => {
-    if (typeof l === 'string') return {name:l, confidence:0};
-    return {name: l.name||l.label||l.description||'Unknown', confidence: l.confidence||l.score||l.probability||0};
+    if (typeof l === 'string') return {name:l, confidence:null};
+    return {name: l.name||l.label||l.description||'Unknown', confidence: l.confidence||l.score||l.probability||null};
   });
 
   let objects = ai.objects || ai.detected_objects || [];
@@ -396,9 +396,11 @@ function renderResults(data) {
       <div class="ranked-labels">`;
     const total = labels.length;
     labels.forEach((l, i) => {
-      // Rank-based width: #1=100%, #2=80%, #3=65%, etc.
+      // Use real confidence if available, else rank-based fallback
       const rankWidths = [100, 80, 65, 52, 42];
-      const barWidth = rankWidths[i] || Math.max(100 - (i * 15), 15);
+      const hasConfidence = l.confidence !== null && l.confidence !== undefined && l.confidence > 0;
+      const barWidth = hasConfidence ? Math.round(l.confidence) : (rankWidths[i] || Math.max(100 - (i * 15), 15));
+      const displayPct = hasConfidence ? l.confidence.toFixed(1) + '%' : '#' + (i+1);
       const rankColors = [
         'linear-gradient(90deg,#6366f1,#22d3ee)',
         'linear-gradient(90deg,#8b5cf6,#6366f1)',
@@ -408,7 +410,7 @@ function renderResults(data) {
       ];
       const color = rankColors[i] || rankColors[4];
       html += `<div class="ranked-label-row">
-        <div class="ranked-label-rank">#${i+1}</div>
+        <div class="ranked-label-rank" style="min-width:44px;">${displayPct}</div>
         <div class="ranked-label-name">${l.name||l}</div>
         <div class="ranked-label-bar-wrap">
           <div class="ranked-label-bar-fill" style="height:100%;border-radius:99px;background:${color};width:0%;transition:width 1.2s cubic-bezier(0.4,0,0.2,1);" data-w="${barWidth}"></div>
