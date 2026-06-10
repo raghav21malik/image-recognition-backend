@@ -132,6 +132,7 @@ function showTab(name, el) {
   if (tabBtn) tabBtn.classList.add('active');
   if (name === 'history') loadHistory();
   if (name === 'analytics') loadAnalytics();
+  if (name === 'benchmark') resetBenchmark();
 }
 
 function scrollToAnalyze() {
@@ -1547,4 +1548,248 @@ async function deleteRecord(id) {
       }
     }
   }
+}
+
+// ══════════════════════════════════════
+// BENCHMARK
+// ══════════════════════════════════════
+
+let benchmarkImageUrl  = null;
+let benchmarkFileData  = null;
+
+// ── Handle file selection ──
+function handleBenchmarkFile(file) {
+  if (!file) return;
+  benchmarkFileData = file;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    document.getElementById('benchmark-preview-img').src = e.target.result;
+    document.getElementById('benchmarkPreviewWrap').style.display = 'block';
+    document.getElementById('benchmarkDropZone').style.display   = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+// Drag & drop support
+document.addEventListener('DOMContentLoaded', function() {
+  const dz = document.getElementById('benchmarkDropZone');
+  if (!dz) return;
+  dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('drag-over'); });
+  dz.addEventListener('dragleave', ()  => dz.classList.remove('drag-over'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault(); dz.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) handleBenchmarkFile(file);
+  });
+});
+
+// ── Run Benchmark ──
+async function runBenchmark() {
+  if (!benchmarkFileData) return;
+
+  // Show loading
+  document.getElementById('benchmarkPreviewWrap').style.display = 'none';
+  document.getElementById('benchmark-loading').style.display    = 'block';
+  document.getElementById('benchmark-results').style.display    = 'none';
+
+  // Animate progress dots
+  const labels = ['ViT-Base', 'ResNet-50', 'EfficientNet', 'ConvNeXt', 'BEiT-Base'];
+  labels.forEach((l, i) => {
+    setTimeout(() => {
+      const el = document.getElementById('bm-prog-' + i);
+      if (el) { el.textContent = '⚡ ' + l; el.className = 'bm-prog-item running'; }
+    }, i * 400);
+  });
+
+  try {
+    // Step 1: Upload image to Cloudinary first via /api/upload
+    const authHeaders = await getAuthHeaders();
+    const formData    = new FormData();
+    formData.append('image', benchmarkFileData);
+
+    showToast('Uploading image...', 'info', 2000);
+
+    const uploadRes  = await fetch(`${BACKEND}/api/upload`, {
+      method: 'POST', body: formData, headers: authHeaders
+    });
+    const uploadData = await uploadRes.json();
+
+    if (!uploadData.image_url) throw new Error('Upload failed');
+
+    benchmarkImageUrl = uploadData.image_url;
+    showToast('Running 5 models in parallel...', 'info', 4000);
+
+    // Step 2: Run benchmark
+    const bmRes  = await fetch(`${BACKEND}/api/benchmark`, {
+      method:  'POST',
+      headers: { ...authHeaders, 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ image_url: benchmarkImageUrl })
+    });
+    const bmData = await bmRes.json();
+
+    if (!bmData.success) throw new Error(bmData.error || 'Benchmark failed');
+
+    // Mark all progress as done
+    labels.forEach((l, i) => {
+      const el = document.getElementById('bm-prog-' + i);
+      const r  = bmData.results[i];
+      if (el) {
+        el.textContent = (r && r.status === 'success' ? '✅ ' : '❌ ') + l;
+        el.className   = 'bm-prog-item ' + (r && r.status === 'success' ? 'done' : 'error');
+      }
+    });
+
+    setTimeout(() => renderBenchmarkResults(bmData), 600);
+
+  } catch(err) {
+    document.getElementById('benchmark-loading').style.display = 'none';
+    document.getElementById('benchmarkPreviewWrap').style.display = 'block';
+    showToast('Benchmark failed: ' + err.message, 'error');
+  }
+}
+
+// ── Render Results ──
+function renderBenchmarkResults(data) {
+  document.getElementById('benchmark-loading').style.display = 'none';
+
+  const { results, best_model, fastest, total_time } = data;
+  const successful = results.filter(r => r.status === 'success');
+
+  // Find best name for summary
+  const bestResult    = results.find(r => r.id === best_model);
+  const fastestResult = results.find(r => r.id === fastest);
+
+  let html = '';
+
+  // ── Summary cards ──
+  html += `<div class="bm-summary">
+    <div class="bm-summary-card">
+      <div class="bm-summary-icon">⭐</div>
+      <div class="bm-summary-val">${bestResult ? bestResult.name : '—'}</div>
+      <div class="bm-summary-lbl">Highest Confidence</div>
+    </div>
+    <div class="bm-summary-card">
+      <div class="bm-summary-icon">⚡</div>
+      <div class="bm-summary-val">${fastestResult ? fastestResult.name : '—'}</div>
+      <div class="bm-summary-lbl">Fastest Model</div>
+    </div>
+    <div class="bm-summary-card">
+      <div class="bm-summary-icon">🕓</div>
+      <div class="bm-summary-val">${total_time}s</div>
+      <div class="bm-summary-lbl">Total Time</div>
+    </div>
+  </div>`;
+
+  // ── Results table ──
+  html += `<div style="overflow-x:auto;">
+  <table class="bm-table">
+    <thead>
+      <tr>
+        <th>Model</th>
+        <th>Architecture</th>
+        <th>Top Label</th>
+        <th>Confidence</th>
+        <th>Time</th>
+        <th>Badge</th>
+      </tr>
+    </thead>
+    <tbody>`;
+
+  results.forEach(r => {
+    const isBest    = r.id === best_model;
+    const isFastest = r.id === fastest;
+    const rowClass  = isBest ? 'bm-best' : '';
+
+    if (r.status === 'success') {
+      html += `<tr class="${rowClass}">
+        <td>
+          <div class="bm-model-name">
+            <div class="bm-model-dot" style="background:${r.color}"></div>
+            ${r.name}
+          </div>
+        </td>
+        <td><span class="bm-arch-badge">${r.architecture}</span></td>
+        <td style="font-weight:600;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.top_label}</td>
+        <td>
+          <div class="bm-conf-wrap">
+            <div class="bm-conf-bar-track">
+              <div class="bm-conf-bar-fill" data-w="${Math.round(r.top_score)}" style="background:${r.color}"></div>
+            </div>
+            <div class="bm-conf-pct">${r.top_score.toFixed(1)}%</div>
+          </div>
+        </td>
+        <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);">${r.time_sec}s</td>
+        <td>
+          ${isBest    ? '<span class="bm-badge best">⭐ Best</span>' : ''}
+          ${isFastest ? '<span class="bm-badge fast">⚡ Fast</span>' : ''}
+        </td>
+      </tr>`;
+    } else {
+      html += `<tr>
+        <td><div class="bm-model-name"><div class="bm-model-dot" style="background:${r.color}"></div>${r.name}</div></td>
+        <td><span class="bm-arch-badge">${r.architecture}</span></td>
+        <td colspan="3" style="color:var(--text3);font-size:12px;font-family:'DM Mono',monospace;">${r.error || 'Failed'}</td>
+        <td><span class="bm-badge error">❌ Error</span></td>
+      </tr>`;
+    }
+  });
+
+  html += `</tbody></table></div>`;
+
+  // ── Top labels per model (expandable) ──
+  html += `<div style="margin-top:16px;">
+    <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px;font-family:'DM Mono',monospace;">All Labels Per Model</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;">`;
+
+  results.filter(r => r.status === 'success').forEach(r => {
+    html += `<div class="card" style="padding:12px;">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+        <div style="width:8px;height:8px;border-radius:50%;background:${r.color};flex-shrink:0;"></div>
+        <div style="font-size:12px;font-weight:700;">${r.name}</div>
+      </div>`;
+    r.labels.forEach((l, i) => {
+      html += `<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;">
+        <div style="font-size:10px;font-family:'DM Mono',monospace;color:var(--accent3);width:20px;">#${i+1}</div>
+        <div style="flex:1;font-size:11px;color:var(--text);text-transform:capitalize;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${l.name}</div>
+        <div style="font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);">${l.confidence.toFixed(1)}%</div>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+
+  html += `</div></div>`;
+
+  // ── Reset button ──
+  html += `<button class="bm-reset-btn" onclick="resetBenchmark()">↩ Run Another Benchmark</button>`;
+
+  const resultsDiv = document.getElementById('benchmark-results');
+  resultsDiv.innerHTML = html;
+  resultsDiv.style.display = 'block';
+
+  // Animate confidence bars
+  setTimeout(() => {
+    resultsDiv.querySelectorAll('.bm-conf-bar-fill[data-w]').forEach(bar => {
+      bar.style.width = bar.getAttribute('data-w') + '%';
+    });
+  }, 200);
+
+  showToast('Benchmark complete! 🏆', 'success');
+}
+
+// ── Reset benchmark ──
+function resetBenchmark() {
+  benchmarkImageUrl = null;
+  benchmarkFileData = null;
+  document.getElementById('benchmarkDropZone').style.display    = 'block';
+  document.getElementById('benchmarkPreviewWrap').style.display = 'none';
+  document.getElementById('benchmark-loading').style.display    = 'none';
+  document.getElementById('benchmark-results').style.display    = 'none';
+  document.getElementById('benchmarkFileInput').value           = '';
+  // Reset progress
+  const labels = ['ViT-Base','ResNet-50','EfficientNet','ConvNeXt','BEiT-Base'];
+  labels.forEach((l, i) => {
+    const el = document.getElementById('bm-prog-' + i);
+    if (el) { el.textContent = '⏳ ' + l; el.className = 'bm-prog-item'; }
+  });
 }
