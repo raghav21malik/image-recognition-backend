@@ -334,18 +334,23 @@ body {
 </div>
 
 <script>
-// ── CONFIG — replace these 2 values ──
-const SUPABASE_URL  = 'https://sywhdzyimwezunvysxex.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5d2hkenlpbXdlenVudnlzeGV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzMzQyMjAsImV4cCI6MjA5NTkxMDIyMH0.AVsbtJvtRykSB7eyIooFBVmjwajrD8ucttt9Tn3V8pA';
-const APP_URL       = 'https://raghav21malik.github.io/image-recognition-frontend/';
+// ── CONFIG ──
+const SUPABASE_URL  = document.querySelector('[data-sburl]')?.dataset?.sburl || window.SUPABASE_URL || '';
+const SUPABASE_ANON = document.querySelector('[data-sbkey]')?.dataset?.sbkey || window.SUPABASE_ANON || '';
+const APP_URL       = window.APP_URL || 'index.html';
+
+window.SUPABASE_URL = SUPABASE_URL;
+window.SUPABASE_ANON = SUPABASE_ANON;
 
 const { createClient } = supabase;
-const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+const sb = SUPABASE_URL && SUPABASE_ANON ? createClient(SUPABASE_URL, SUPABASE_ANON) : null;
 
 // ── Check if already logged in ──
-sb.auth.getSession().then(({ data }) => {
-  if (data.session) window.location.href = APP_URL;
-});
+if (sb) {
+  sb.auth.getSession().then(({ data }) => {
+    if (data.session) window.location.href = APP_URL;
+  });
+}
 
 // ── Tab switch ──
 function switchTab(tab) {
@@ -357,7 +362,16 @@ function switchTab(tab) {
 }
 
 // ── Sign In ──
+function ensureSupabase() {
+  if (!sb) {
+    showMsg('Authentication is not configured. Set Supabase URL and anon key first.', 'error');
+    return false;
+  }
+  return true;
+}
+
 async function signIn() {
+  if (!ensureSupabase()) return;
   const email    = document.getElementById('signin-email').value.trim();
   const password = document.getElementById('signin-password').value;
   if (!email || !password) { showMsg('Please fill in all fields.', 'error'); return; }
@@ -371,6 +385,7 @@ async function signIn() {
 
 // ── Sign Up ──
 async function signUp() {
+  if (!ensureSupabase()) return;
   const name     = document.getElementById('signup-name').value.trim();
   const email    = document.getElementById('signup-email').value.trim();
   const password = document.getElementById('signup-password').value;

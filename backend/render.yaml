@@ -1,6 +1,7 @@
 services:
   - type: web
     name: image-recognition-backend
+    # Monorepo deployment: backend service lives under /backend.
     rootDir: backend
     env: python
     buildCommand: pip install -r requirements.txt

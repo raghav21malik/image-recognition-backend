@@ -1,6 +1,9 @@
-const SUPABASE_URL  = 'https://sywhdzyimwezunvysxex.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5d2hkenlpbXdlenVudnlzeGV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzMzQyMjAsImV4cCI6MjA5NTkxMDIyMH0.AVsbtJvtRykSB7eyIooFBVmjwajrD8ucttt9Tn3V8pA';
+const SUPABASE_URL  = document.querySelector('[data-sburl]')?.dataset?.sburl || window.SUPABASE_URL || '';
+const SUPABASE_ANON = document.querySelector('[data-sbkey]')?.dataset?.sbkey || window.SUPABASE_ANON || '';
 const AUTH_PAGE     = 'auth.html';
+
+window.SUPABASE_URL = SUPABASE_URL;
+window.SUPABASE_ANON = SUPABASE_ANON;
 
 // Load Supabase SDK dynamically
 (function loadSupabase() {
@@ -15,6 +18,12 @@ let sbClient = null;
 let currentUser = null;
 
 function initSupabase() {
+  if (!SUPABASE_URL || !SUPABASE_ANON) {
+    console.warn('Supabase config missing. Set window.SUPABASE_URL and window.SUPABASE_ANON or provide data-sburl/data-sbkey attributes.');
+    renderGuestInNav();
+    return;
+  }
+
   sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
   // Check session on load
