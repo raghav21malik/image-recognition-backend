@@ -2804,3 +2804,63 @@ html {
   .bm-summary { grid-template-columns: 1fr; }
   .bm-conf-bar-track { display: none; }
 }
+
+/* ══════════════════════════════════════
+   MODEL SELECTOR
+══════════════════════════════════════ */
+.model-selector-wrap {
+  margin: 16px 0 12px;
+}
+.model-selector-label {
+  font-size: 11px; font-weight: 700;
+  color: var(--text3); text-transform: uppercase;
+  letter-spacing: 0.8px; font-family: 'DM Mono', monospace;
+  margin-bottom: 8px;
+}
+.model-pills {
+  display: flex; flex-wrap: wrap; gap: 8px;
+}
+.model-pill {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 2px;
+  padding: 8px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 10px; cursor: pointer;
+  transition: all 0.2s; flex: 1; min-width: 80px;
+}
+.model-pill:hover {
+  background: var(--surface2);
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+.model-pill.active {
+  background: rgba(99,102,241,0.12);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px rgba(99,102,241,0.2);
+}
+.model-pill-name {
+  font-size: 12px; font-weight: 700;
+  color: var(--text);
+}
+.model-pill.active .model-pill-name { color: var(--accent3); }
+.model-pill-arch {
+  font-size: 9px; font-family: 'DM Mono', monospace;
+  color: var(--text3); text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.best-pill {
+  background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(251,191,36,0.08));
+  border-color: rgba(251,191,36,0.2);
+}
+.best-pill.active {
+  background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(251,191,36,0.15));
+  border-color: var(--warning);
+  box-shadow: 0 0 0 1px rgba(251,191,36,0.2);
+}
+.best-pill .model-pill-name { color: var(--warning); }
+
+@media (max-width: 480px) {
+  .model-pill { min-width: 60px; padding: 6px 8px; }
+  .model-pill-name { font-size: 10px; }
+}
