@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>VisionCloud — README</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'"/>
+<link rel="stylesheet" href="style.css"/>
+<style>
+.readme-wrap {
+  max-width: 860px; margin: 0 auto;
+  padding: 40px 24px 80px;
+  position: relative; z-index: 1;
+}
+.readme-hero {
+  text-align: center;
+  padding: 48px 0 40px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 40px;
+}
+.readme-logo {
+  width: 64px; height: 64px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-radius: 18px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 30px; margin-bottom: 20px;
+  box-shadow: 0 0 40px rgba(99,102,241,0.35);
+}
+.readme-title {
+  font-size: 36px; font-weight: 800;
+  letter-spacing: -1px; margin-bottom: 10px;
+  background: linear-gradient(135deg, var(--text), var(--accent3));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.readme-subtitle {
+  font-size: 15px; color: var(--text2);
+  max-width: 500px; margin: 0 auto 20px;
+  line-height: 1.6;
+}
+.readme-badges {
+  display: flex; flex-wrap: wrap;
+  gap: 8px; justify-content: center;
+  margin-top: 16px;
+}
+.readme-badge {
+  font-size: 11px; font-weight: 700;
+  font-family: 'DM Mono', monospace;
+  padding: 4px 12px; border-radius: 20px;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  color: var(--text2);
+}
+.readme-badge.green  { background: rgba(52,211,153,0.1);  border-color: rgba(52,211,153,0.25);  color: var(--success); }
+.readme-badge.blue   { background: rgba(99,102,241,0.1);  border-color: rgba(99,102,241,0.25);  color: var(--accent3); }
+.readme-badge.yellow { background: rgba(251,191,36,0.1);  border-color: rgba(251,191,36,0.25);  color: var(--warning); }
+.readme-badge.cyan   { background: rgba(34,211,238,0.1);  border-color: rgba(34,211,238,0.25);  color: var(--accent2); }
+
+/* Sections */
+.readme-section { margin-bottom: 40px; }
+.readme-section-title {
+  font-size: 11px; font-weight: 700;
+  font-family: 'DM Mono', monospace;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--accent3); margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.readme-section-title::after {
+  content: ''; flex: 1; height: 1px;
+  background: var(--border);
+}
+.readme-h2 {
+  font-size: 22px; font-weight: 800;
+  letter-spacing: -0.5px; margin-bottom: 14px;
+  color: var(--text);
+}
+.readme-p {
+  font-size: 14px; color: var(--text2);
+  line-height: 1.8; margin-bottom: 12px;
+}
+
+/* Feature grid */
+.readme-features {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px; margin-bottom: 16px;
+}
+.readme-feature {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px 16px;
+  display: flex; gap: 12px; align-items: flex-start;
+}
+.readme-feature-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+.readme-feature-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.readme-feature-desc { font-size: 12px; color: var(--text3); line-height: 1.5; }
+
+/* Tech table */
+.readme-table {
+  width: 100%; border-collapse: collapse;
+  margin-bottom: 16px;
+}
+.readme-table th {
+  font-size: 10px; font-weight: 700;
+  font-family: 'DM Mono', monospace;
+  text-transform: uppercase; letter-spacing: 0.8px;
+  color: var(--text3); padding: 8px 14px;
+  text-align: left; border-bottom: 1px solid var(--border2);
+}
+.readme-table td {
+  padding: 10px 14px; font-size: 13px;
+  color: var(--text); border-bottom: 1px solid rgba(255,255,255,0.04);
+  vertical-align: middle;
+}
+.readme-table tr:last-child td { border-bottom: none; }
+.readme-table code {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; background: rgba(99,102,241,0.08);
+  border: 1px solid rgba(99,102,241,0.15);
+  padding: 2px 7px; border-radius: 4px;
+  color: var(--accent3);
+}
+
+/* Code block */
+.readme-code {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--border2);
+  border-radius: 12px; padding: 16px 20px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px; color: #a5f3fc;
+  line-height: 1.8; margin-bottom: 16px;
+  overflow-x: auto;
+}
+.readme-code .comment { color: #475569; }
+.readme-code .keyword { color: #a78bfa; }
+.readme-code .string  { color: #34d399; }
+
+/* API endpoint cards */
+.api-endpoints { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.api-endpoint {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 16px;
+  display: flex; align-items: center; gap: 12px;
+}
+.api-method {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; font-weight: 700;
+  padding: 3px 8px; border-radius: 5px;
+  min-width: 48px; text-align: center;
+}
+.api-method.get  { background: rgba(52,211,153,0.1);  color: var(--success); }
+.api-method.post { background: rgba(99,102,241,0.1);  color: var(--accent3); }
+.api-path {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px; color: var(--text);
+  flex: 1;
+}
+.api-desc { font-size: 12px; color: var(--text3); }
+
+/* Model table row colors */
+.model-dot-vit  { color: #6366f1; }
+.model-dot-res  { color: #22d3ee; }
+.model-dot-eff  { color: #34d399; }
+.model-dot-conv { color: #f472b6; }
+.model-dot-beit { color: #fbbf24; }
+
+/* Team */
+.readme-team {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+.readme-team-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px; padding: 16px;
+  text-align: center;
+}
+.readme-team-avatar {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent), var(--accent3));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 800; color: white;
+  margin: 0 auto 10px;
+}
+.readme-team-name { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.readme-team-role {
+  font-size: 10px; font-family: 'DM Mono', monospace;
+  color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px;
+}
+.readme-team-lead { border-color: rgba(99,102,241,0.3); }
+.readme-team-lead .readme-team-avatar { background: linear-gradient(135deg, #6366f1, #22d3ee); }
+
+/* Links */
+.readme-links { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+.readme-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--surface); border: 1px solid var(--border2);
+  color: var(--text2); font-size: 12px; font-weight: 600;
+  padding: 8px 16px; border-radius: 9px;
+  text-decoration: none; transition: all 0.2s;
+  font-family: 'Bricolage Grotesque', sans-serif;
+}
+.readme-link:hover {
+  border-color: var(--accent); color: var(--accent3);
+  background: rgba(99,102,241,0.06);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 600px) {
+  .readme-features { grid-template-columns: 1fr; }
+  .readme-title { font-size: 26px; }
+  .readme-table th:nth-child(3),
+  .readme-table td:nth-child(3) { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="mesh-bg"></div>
+<div class="grid-overlay"></div>
+
+<!-- Navbar -->
+<nav>
+  <div class="nav-logo">
+    <div class="nav-logo-icon">🔍</div>
+    <span class="nav-logo-text">Vision<span class="accent">Cloud</span></span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="index.html">← Back to App</a></li>
+    <li><a href="architecture.html">Architecture</a></li>
+  </ul>
+  <div style="display:flex;align-items:center;">
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+  </div>
+</nav>
+
+<div class="readme-wrap">
+
+  <!-- Hero -->
+  <div class="readme-hero">
+    <div class="readme-logo">🔍</div>
+    <div class="readme-title">VisionCloud</div>
+    <div class="readme-subtitle">A cloud-native AI image recognition platform built with Python Flask, Hugging Face Vision AI, Supabase, and Cloudinary — deployed on enterprise cloud infrastructure.</div>
+    <div class="readme-badges">
+      <span class="readme-badge green">✓ Live &amp; Deployed</span>
+      <span class="readme-badge blue">5 AI Models</span>
+      <span class="readme-badge yellow">B.Tech CSE Project</span>
+      <span class="readme-badge cyan">Cloud Computing</span>
+      <span class="readme-badge green">JWT Auth</span>
+      <span class="readme-badge blue">Open Source</span>
+    </div>
+    <div class="readme-links" style="justify-content:center;margin-top:20px;">
+      <a class="readme-link" href="index.html">🚀 Live Demo</a>
+      <a class="readme-link" href="architecture.html">🏗 Architecture</a>
+      <a class="readme-link" href="https://github.com/raghav21malik/image-recognition-frontend" target="_blank">⭐ Frontend Repo</a>
+      <a class="readme-link" href="https://image-recognition-backend-93d6.onrender.com" target="_blank">⚙️ Backend API</a>
+    </div>
+  </div>
+
+  <!-- Overview -->
+  <div class="readme-section">
+    <div class="readme-section-title">01 — Overview</div>
+    <div class="readme-h2">What is VisionCloud?</div>
+    <div class="readme-p">VisionCloud is a full-stack cloud-native web application that lets users upload images and classify them using state-of-the-art computer vision models. The platform integrates five different AI architectures hosted on Hugging Face, stores images on Cloudinary CDN, persists results to Supabase PostgreSQL, and provides a rich analytics dashboard — all secured behind JWT-based user authentication.</div>
+    <div class="readme-p">Built as a B.Tech Computer Science capstone project with Cloud Computing specialization, VisionCloud demonstrates real-world cloud architecture patterns: microservices, serverless AI inference, CDN storage, managed databases, and continuous deployment.</div>
+  </div>
+
+  <!-- Features -->
+  <div class="readme-section">
+    <div class="readme-section-title">02 — Features</div>
+    <div class="readme-h2">Key Features</div>
+    <div class="readme-features">
+      <div class="readme-feature">
+        <div class="readme-feature-icon">🤖</div>
+        <div>
+          <div class="readme-feature-title">AI Image Classification</div>
+          <div class="readme-feature-desc">Upload any image and get instant AI-powered labels with real confidence scores from Hugging Face Vision models.</div>
+        </div>
+      </div>
+      <div class="readme-feature">
+        <div class="readme-feature-icon">🏆</div>
+        <div>
+          <div class="readme-feature-title">Multi-Model Benchmark</div>
+          <div class="readme-feature-desc">Run all 5 AI models in parallel on a single image and compare results, confidence and inference speed side by side.</div>
+        </div>
+      </div>
+      <div class="readme-feature">
+        <div class="readme-feature-icon">🔐</div>
+        <div>
+          <div class="readme-feature-title">User Authentication</div>
+          <div class="readme-feature-desc">Secure email/password registration and login via Supabase Auth with JWT session management.</div>
+        </div>
+      </div>
+      <div class="readme-feature">
+        <div class="readme-feature-icon">📊</div>
+        <div>
+          <div class="readme-feature-title">Analytics Dashboard</div>
+          <div class="readme-feature-desc">Visualize your scan history with scans-per-day charts, top label frequency bars and activity timeline.</div>
+        </div>
+      </div>
+      <div class="readme-feature">
+        <div class="readme-feature-icon">🖼️</div>
+        <div>
+          <div class="readme-feature-title">Cloud Image Storage</div>
+          <div class="readme-feature-desc">All images auto-uploaded to Cloudinary CDN with optimization, format conversion and permanent URLs.</div>
+        </div>
+      </div>
+      <div class="readme-feature">
+        <div class="readme-feature-icon">🔍</div>
+        <div>
+          <div class="readme-feature-title">Label Search</div>
+          <div class="readme-feature-desc">Search scan history by AI-detected labels — instantly filter images by what's in them, not just filename.</div>
+        </div>
+      </div>
+      <div class="readme-feature">
+        <div class="readme-feature-icon">🌙</div>
+        <div>
+          <div class="readme-feature-title">Dark / Light Mode</div>
+          <div class="readme-feature-desc">Full theme switching with localStorage persistence. Keyboard shortcut Ctrl+D to toggle instantly.</div>
+        </div>
+      </div>
+      <div class="readme-feature">
+        <div class="readme-feature-icon">📱</div>
+        <div>
+          <div class="readme-feature-title">Responsive Design</div>
+          <div class="readme-feature-desc">Fully responsive UI — desktop-first with clean mobile layout, touch-friendly interactions.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tech Stack -->
+  <div class="readme-section">
+    <div class="readme-section-title">03 — Tech Stack</div>
+    <div class="readme-h2">Technology Stack</div>
+    <table class="readme-table">
+      <thead>
+        <tr>
+          <th>Layer</th>
+          <th>Technology</th>
+          <th>Purpose</th>
+          <th>Version</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Frontend</td><td>HTML5 / CSS3 / Vanilla JS</td><td>UI, animations, interactivity</td><td>ES2022</td></tr>
+        <tr><td>Frontend Host</td><td>GitHub Pages</td><td>Static site deployment</td><td>—</td></tr>
+        <tr><td>Backend</td><td>Python Flask</td><td>REST API server</td><td>3.0.2</td></tr>
+        <tr><td>Backend Host</td><td>Render</td><td>Cloud backend deployment</td><td>—</td></tr>
+        <tr><td>AI / ML</td><td>Hugging Face Inference API</td><td>5 vision model inference</td><td>—</td></tr>
+        <tr><td>Image Storage</td><td>Cloudinary</td><td>CDN image hosting</td><td>1.40.0</td></tr>
+        <tr><td>Database</td><td>Supabase PostgreSQL</td><td>Scan history storage</td><td>2.0.3</td></tr>
+        <tr><td>Auth</td><td>Supabase Auth</td><td>JWT user authentication</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- AI Models -->
+  <div class="readme-section">
+    <div class="readme-section-title">04 — AI Models</div>
+    <div class="readme-h2">5 Vision AI Models</div>
+    <div class="readme-p">All models are hosted on Hugging Face Inference API and accessed via REST. Users can select any model or run all 5 in parallel via the Benchmark feature.</div>
+    <table class="readme-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Model</th>
+          <th>Architecture</th>
+          <th>Model ID</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="model-dot-vit">●</td>
+          <td><strong>ViT-Base/16</strong></td>
+          <td>Vision Transformer</td>
+          <td><code>google/vit-base-patch16-224</code></td>
+        </tr>
+        <tr>
+          <td class="model-dot-res">●</td>
+          <td><strong>ResNet-50</strong></td>
+          <td>Residual Network</td>
+          <td><code>microsoft/resnet-50</code></td>
+        </tr>
+        <tr>
+          <td class="model-dot-eff">●</td>
+          <td><strong>EfficientNet-B0</strong></td>
+          <td>EfficientNet</td>
+          <td><code>google/efficientnet-b0</code></td>
+        </tr>
+        <tr>
+          <td class="model-dot-conv">●</td>
+          <td><strong>ConvNeXt-Tiny</strong></td>
+          <td>Modern CNN</td>
+          <td><code>facebook/convnext-tiny-224</code></td>
+        </tr>
+        <tr>
+          <td class="model-dot-beit">●</td>
+          <td><strong>BEiT-Base/16</strong></td>
+          <td>BERT for Vision</td>
+          <td><code>microsoft/beit-base-patch16-224</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- API Reference -->
+  <div class="readme-section">
+    <div class="readme-section-title">05 — API Reference</div>
+    <div class="readme-h2">REST API Endpoints</div>
+    <div class="readme-p">Base URL: <code style="font-family:'DM Mono',monospace;font-size:12px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.15);padding:3px 10px;border-radius:5px;color:var(--accent3);">https://image-recognition-backend-93d6.onrender.com</code></div>
+    <div class="api-endpoints">
+      <div class="api-endpoint">
+        <span class="api-method get">GET</span>
+        <span class="api-path">/</span>
+        <span class="api-desc">Health check — returns API status</span>
+      </div>
+      <div class="api-endpoint">
+        <span class="api-method post">POST</span>
+        <span class="api-path">/api/upload</span>
+        <span class="api-desc">Upload image → Cloudinary → HF AI → Supabase</span>
+      </div>
+      <div class="api-endpoint">
+        <span class="api-method get">GET</span>
+        <span class="api-path">/api/history</span>
+        <span class="api-desc">Fetch scan history (filtered by authenticated user)</span>
+      </div>
+      <div class="api-endpoint">
+        <span class="api-method post">POST</span>
+        <span class="api-path">/api/benchmark</span>
+        <span class="api-desc">Run all 5 models in parallel on provided image URL</span>
+      </div>
+    </div>
+
+    <div class="readme-p" style="margin-top:8px;">Example request body for <code style="font-family:'DM Mono',monospace;font-size:11px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.15);padding:2px 7px;border-radius:4px;color:var(--accent3);">/api/benchmark</code>:</div>
+    <div class="readme-code">
+<span class="comment">// POST /api/benchmark</span>
+{
+  <span class="string">"image_url"</span>: <span class="string">"https://res.cloudinary.com/your-cloud/image.jpg"</span>
+}
+
+<span class="comment">// Response</span>
+{
+  <span class="string">"success"</span>: <span class="keyword">true</span>,
+  <span class="string">"total_time"</span>: <span class="string">4.2</span>,
+  <span class="string">"best_model"</span>: <span class="string">"google/vit-base-patch16-224"</span>,
+  <span class="string">"fastest"</span>: <span class="string">"microsoft/resnet-50"</span>,
+  <span class="string">"results"</span>: [ <span class="comment">/* array of 5 model results */</span> ]
+}
+    </div>
+  </div>
+
+  <!-- Architecture -->
+  <div class="readme-section">
+    <div class="readme-section-title">06 — Architecture</div>
+    <div class="readme-h2">System Architecture</div>
+    <div class="readme-p">VisionCloud uses a decoupled architecture with the frontend and backend deployed on separate platforms, communicating via REST API calls.</div>
+    <div class="readme-code">
+<span class="comment">┌─────────────────────────────────────────────────────┐</span>
+<span class="comment">│               USER BROWSER                          │</span>
+<span class="comment">│         GitHub Pages (Frontend)                     │</span>
+<span class="comment">└──────────────────────┬──────────────────────────────┘</span>
+                       <span class="keyword">│ REST API calls</span>
+<span class="comment">┌──────────────────────▼──────────────────────────────┐</span>
+<span class="comment">│          RENDER (Flask Backend)                     │</span>
+<span class="comment">│   /api/upload  /api/history  /api/benchmark         │</span>
+<span class="comment">└───┬─────────────────┬──────────────────┬────────────┘</span>
+    <span class="keyword">│</span>                 <span class="keyword">│</span>                  <span class="keyword">│</span>
+<span class="string">Cloudinary</span>    <span class="string">Hugging Face</span>      <span class="string">Supabase</span>
+<span class="comment">(Images)      (5 AI Models)     (DB + Auth)</span>
+    </div>
+  </div>
+
+  <!-- Setup -->
+  <div class="readme-section">
+    <div class="readme-section-title">07 — Setup</div>
+    <div class="readme-h2">Environment Variables</div>
+    <div class="readme-p">The following environment variables are required on the backend (set in Render dashboard):</div>
+    <div class="readme-code">
+<span class="comment"># Cloudinary</span>
+<span class="string">CLOUDINARY_CLOUD_NAME</span>=your_cloud_name
+<span class="string">CLOUDINARY_API_KEY</span>=your_api_key
+<span class="string">CLOUDINARY_API_SECRET</span>=your_api_secret
+
+<span class="comment"># Supabase</span>
+<span class="string">SUPABASE_URL</span>=https://xxxx.supabase.co
+<span class="string">SUPABASE_KEY</span>=your_supabase_anon_key
+
+<span class="comment"># Hugging Face</span>
+<span class="string">HF_API_TOKEN</span>=hf_xxxxxxxxxxxxxxxxxxxx
+    </div>
+  </div>
+
+  <!-- Team -->
+  <div class="readme-section">
+    <div class="readme-section-title">08 — Team</div>
+    <div class="readme-h2">Project Team</div>
+    <div class="readme-p">B.Tech Computer Science — Cloud Computing Specialization</div>
+    <div class="readme-team">
+      <div class="readme-team-card readme-team-lead">
+        <div class="readme-team-avatar">R</div>
+        <div class="readme-team-name">Raghav Malik</div>
+        <div class="readme-team-role">Group Lead</div>
+      </div>
+      <div class="readme-team-card">
+        <div class="readme-team-avatar" style="background:linear-gradient(135deg,#8b5cf6,#6366f1);">I</div>
+        <div class="readme-team-name">Ishan Pratap Singh</div>
+        <div class="readme-team-role">Member</div>
+      </div>
+      <div class="readme-team-card">
+        <div class="readme-team-avatar" style="background:linear-gradient(135deg,#f472b6,#8b5cf6);">A</div>
+        <div class="readme-team-name">Akshay Kumar</div>
+        <div class="readme-team-role">Member</div>
+      </div>
+      <div class="readme-team-card">
+        <div class="readme-team-avatar" style="background:linear-gradient(135deg,#22d3ee,#6366f1);">N</div>
+        <div class="readme-team-name">Nitin Pandey</div>
+        <div class="readme-team-role">Member</div>
+      </div>
+    </div>
+    <div style="margin-top:20px;padding:16px 20px;background:var(--surface);border:1px solid var(--border);border-radius:12px;">
+      <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Project Mentor</div>
+      <div style="font-size:16px;font-weight:700;color:var(--accent3);">A Sai Venkateshwar Rao</div>
+      <div style="font-size:12px;color:var(--text2);margin-top:2px;">Project Guide &amp; Mentor</div>
+    </div>
+  </div>
+
+  <!-- License -->
+  <div class="readme-section">
+    <div class="readme-section-title">09 — License</div>
+    <div class="readme-h2">License &amp; Acknowledgements</div>
+    <div class="readme-p">This project is built for academic purposes as part of B.Tech CSE curriculum. All third-party services (Cloudinary, Supabase, Hugging Face, Render) are used under their respective free-tier terms.</div>
+    <div class="readme-p">AI models are open-source and hosted by Hugging Face: ViT by Google Research, ResNet &amp; BEiT by Microsoft, EfficientNet by Google Brain, ConvNeXt by Meta AI.</div>
+    <div style="margin-top:16px;padding:14px 18px;background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.15);border-radius:12px;font-size:13px;color:var(--text2);">
+      © 2026 VisionCloud · Built by Raghav Malik, Ishan Pratap Singh, Akshay Kumar, Nitin Pandey · Guided by A Sai Venkateshwar Rao
+    </div>
+  </div>
+
+</div>
+
+<script src="script.js"></script>
+<script>
+// Theme toggle for readme page
+(function() {
+  const saved = localStorage.getItem('vc-theme');
+  if (saved === 'light') {
+    document.documentElement.setAttribute('data-theme', 'light');
+    const btn = document.getElementById('themeToggle');
+    if (btn) btn.textContent = '🌙';
+  }
+})();
+</script>
+</body>
+</html>
