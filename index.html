@@ -34,6 +34,7 @@
     <li><a href="#" onclick="showTab('history',this);return false;">🕓 History</a></li>
     <li><a href="#" onclick="showTab('analytics',this);return false;">📊 Analytics</a></li>
     <li><a href="#" onclick="showTab('benchmark',this);return false;">🏆 Benchmark</a></li>
+    <li><a href="readme.html" target="_blank">📄 README</a></li>
     <li><a href="architecture.html">🏗 Architecture</a></li>
     <span class="nav-badge">LIVE</span>
   </ul>
@@ -63,7 +64,6 @@
     </div>
     <div class="hero-cta">
       <button class="btn-primary" onclick="scrollToAnalyze()"><span>🚀 Try It Now</span></button>
-      <button class="btn-secondary" onclick="runDemoScan()">Demo Scan</button>
       <button class="btn-secondary" onclick="window.location.href='architecture.html'">🏗 View Architecture</button>
     </div>
     <div class="deploy-badges">
@@ -164,7 +164,6 @@
       <div class="card-body">
         <div class="smart-actions" aria-label="Quick actions">
           <button class="smart-action active" type="button" onclick="scrollToAnalyze()">Upload</button>
-          <button class="smart-action" type="button" onclick="runDemoScan()">Demo</button>
           <button class="smart-action" type="button" onclick="showTab('history', document.getElementById('tab-btn-history'))">History</button>
           <button class="smart-action" type="button" onclick="showTab('analytics', document.getElementById('tab-btn-analytics'))">Insights</button>
         </div>
@@ -182,8 +181,39 @@
             <button class="btn-remove" onclick="resetUpload()">✕ Remove</button>
           </div>
         </div>
+        <!-- Model Selector -->
+        <div class="model-selector-wrap" id="modelSelectorWrap">
+          <div class="model-selector-label">🤖 Select AI Model</div>
+          <div class="model-pills" id="modelPills">
+            <button class="model-pill active" data-model="google/vit-base-patch16-224" onclick="selectModel(this)">
+              <span class="model-pill-name">ViT-Base</span>
+              <span class="model-pill-arch">Transformer</span>
+            </button>
+            <button class="model-pill" data-model="microsoft/resnet-50" onclick="selectModel(this)">
+              <span class="model-pill-name">ResNet-50</span>
+              <span class="model-pill-arch">CNN</span>
+            </button>
+            <button class="model-pill" data-model="google/efficientnet-b0" onclick="selectModel(this)">
+              <span class="model-pill-name">EfficientNet</span>
+              <span class="model-pill-arch">Efficient</span>
+            </button>
+            <button class="model-pill" data-model="facebook/convnext-tiny-224" onclick="selectModel(this)">
+              <span class="model-pill-name">ConvNeXt</span>
+              <span class="model-pill-arch">Modern CNN</span>
+            </button>
+            <button class="model-pill" data-model="microsoft/beit-base-patch16-224" onclick="selectModel(this)">
+              <span class="model-pill-name">BEiT-Base</span>
+              <span class="model-pill-arch">BERT Vision</span>
+            </button>
+            <button class="model-pill best-pill" data-model="best" onclick="selectModel(this)">
+              <span class="model-pill-name">⭐ Best</span>
+              <span class="model-pill-arch">All 5 Models</span>
+            </button>
+          </div>
+        </div>
+
         <button class="btn-analyze" id="analyzeBtn" onclick="analyzeImage()" disabled>
-          <span>🔍 Analyze with Hugging Face AI</span>
+          <span>🔍 Analyze with AI</span>
         </button>
         <div style="text-align:center;margin-top:8px;" class="kbd-hint">Press <kbd class="kbd">Enter</kbd> to analyze · <kbd class="kbd">Esc</kbd> to reset · <kbd class="kbd">U</kbd> to upload</div>
         <div class="error-box" id="errorBox"></div>
