@@ -157,7 +157,9 @@ if (fileInput) {
   fileInput.addEventListener('change', () => { if (fileInput.files[0]) handleFile(fileInput.files[0]); });
 }
 
+let currentFile = null;
 function handleFile(file) {
+  currentFile = file;
   const maxSize = 10 * 1024 * 1024;
   const meta = document.getElementById('dropMeta');
   if (!file.type.startsWith('image/')) {
@@ -201,37 +203,7 @@ function resetUpload() {
   document.getElementById('loadingWrap').classList.remove('visible');
 }
 
-function runDemoScan() {
-  showTab('analyze', document.getElementById('tab-btn-analyze'));
-  scrollToAnalyze();
-  const demoData = {
-    image_url: '',
-    ai_results: {
-      labels: [
-        { name: 'futuristic control room', confidence: 0.97 },
-        { name: 'computer vision dashboard', confidence: 0.91 },
-        { name: 'cloud analytics interface', confidence: 0.86 },
-        { name: 'neural network display', confidence: 0.79 }
-      ],
-      objects: ['dashboard panels', 'data stream', 'vision model', 'cloud pipeline'],
-      detected_text: 'VISIONCLOUD · AI READY · LIVE PIPELINE',
-      dominant_colors: ['#6366f1', '#22d3ee', '#34d399']
-    },
-    record_id: 'demo-scan'
-  };
-  document.getElementById('previewWrap').classList.remove('visible');
-  document.getElementById('loadingWrap').classList.add('visible');
-  setStep(1);
-  setTimeout(() => setStep(2), 450);
-  setTimeout(() => setStep(3), 900);
-  setTimeout(() => {
-    document.getElementById('loadingWrap').classList.remove('visible');
-    renderResults(demoData);
-    showToast('Demo scan generated.', 'success');
-  }, 1300);
-}
 
-// ── Loading steps ──
 function setStep(n) {
   for (let i=1;i<=3;i++) {
     const el = document.getElementById('step'+i);
@@ -255,6 +227,7 @@ async function analyzeImage() {
   setStep(1);
   const formData = new FormData();
   formData.append('image', selectedFile);
+  formData.append('model', selectedModel || 'google/vit-base-patch16-224');
   const apiUrl = `${BACKEND}/api/upload`;
   console.log("Uploading file:", selectedFile.name, selectedFile.type, selectedFile.size + " bytes");
   console.log("Backend URL:", apiUrl);
@@ -1274,7 +1247,6 @@ function initParticles() {
 // ══════════════════════════════════════
 const CMD_ITEMS = [
   { icon: '📤', label: 'Upload Image', shortcut: 'U', action: () => { document.getElementById('fileInput')?.click(); } },
-  { icon: '🎯', label: 'Run Demo Scan', shortcut: '', action: () => { if (typeof runDemoScan === 'function') runDemoScan(); } },
   { icon: '🕓', label: 'View History', shortcut: '', action: () => { if (typeof showTab === 'function') showTab('history', document.getElementById('tab-btn-history')); } },
   { icon: '📊', label: 'View Analytics', shortcut: '', action: () => { if (typeof showTab === 'function') showTab('analytics', document.getElementById('tab-btn-analytics')); } },
   { icon: '🏗', label: 'Architecture', shortcut: '', action: () => { window.location.href = 'architecture.html'; } },
@@ -1793,3 +1765,37 @@ function resetBenchmark() {
     if (el) { el.textContent = '⏳ ' + l; el.className = 'bm-prog-item'; }
   });
 }
+
+// ══════════════════════════════════════
+// MODEL SELECTOR
+// ══════════════════════════════════════
+let selectedModel = 'google/vit-base-patch16-224';
+
+function selectModel(btn) {
+  document.querySelectorAll('.model-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  selectedModel = btn.getAttribute('data-model');
+}
+
+// ── Patch analyzeImage to use selected model + handle "best" ──
+const _origAnalyzeImage = analyzeImage;
+window.analyzeImage = async function() {
+  if (selectedModel === 'best') {
+    // Run benchmark instead
+    if (!currentFile) return;
+    showTab('benchmark', document.getElementById('tab-btn-benchmark'));
+    setTimeout(async () => {
+      benchmarkFileData = currentFile;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        document.getElementById('benchmark-preview-img').src = e.target.result;
+        document.getElementById('benchmarkPreviewWrap').style.display = 'block';
+        document.getElementById('benchmarkDropZone').style.display = 'none';
+      };
+      reader.readAsDataURL(currentFile);
+      await runBenchmark();
+    }, 300);
+    return;
+  }
+  _origAnalyzeImage();
+};
