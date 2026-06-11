@@ -32,10 +32,17 @@ API runs at `http://localhost:5000` by default.
 
 - Static HTML/CSS/JS app
 - Main page: `frontend/index.html`
+- Supabase config is injected at runtime (not hardcoded in repo)
 
 ### Run locally
 
 Open `frontend/index.html` in your browser, or serve it with a local static server.
+
+Before using auth-enabled features, set credentials in a local, untracked config script (for example `frontend/local-config.js`) loaded before `script.js`:
+
+- `window.SUPABASE_URL`
+- `window.SUPABASE_ANON`
+- Optional: `window.APP_URL` for auth redirects
 
 ## Deploying together
 
