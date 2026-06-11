@@ -25,15 +25,17 @@ supabase: Client = create_client(url, key)
 
 # Hugging Face Config
 HF_API_TOKEN = os.getenv("HF_API_TOKEN")
+HF_BASE      = "https://router.huggingface.co/hf-inference/models/"
+HF_HEADERS   = {"Authorization": f"Bearer {HF_API_TOKEN}"}
 
-HF_API_URL = (
-    "https://router.huggingface.co/hf-inference/models/"
-    "google/vit-base-patch16-224"
-)
-
-HF_HEADERS = {
-    "Authorization": f"Bearer {HF_API_TOKEN}"
+ALLOWED_MODELS = {
+    "google/vit-base-patch16-224",
+    "microsoft/resnet-50",
+    "google/efficientnet-b0",
+    "facebook/convnext-tiny-224",
+    "microsoft/beit-base-patch16-224",
 }
+DEFAULT_MODEL = "google/vit-base-patch16-224" 
 
 
 @upload_bp.route('/upload', methods=['POST'])
@@ -70,11 +72,16 @@ def upload_image():
         fmt     = upload_result.get('format')
         size    = upload_result.get('bytes')
 
-        # ── Hugging Face AI Classification ───────────────────────
+        # ── Hugging Face AI Classification (dynamic model) ──────
+        model_id = request.form.get('model', DEFAULT_MODEL)
+        if model_id not in ALLOWED_MODELS:
+            model_id = DEFAULT_MODEL
+
         hf_response = requests.post(
-            HF_API_URL,
+            HF_BASE + model_id,
             headers=HF_HEADERS,
-            json={"inputs": img_url}
+            json={"inputs": img_url},
+            timeout=20
         )
 
         hf_result = hf_response.json()
@@ -114,6 +121,7 @@ def upload_image():
             "message":   "Image analyzed and saved successfully!",
             "image_url": img_url,
             "user_id":   user_id,
+            "model_used": model_id,
             "analysis": {
                 "labels": labels
             }
