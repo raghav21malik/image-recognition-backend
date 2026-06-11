@@ -236,12 +236,12 @@
 
 <!-- ── NAVBAR ── -->
 <nav>
-  <a class="nav-logo" href="index.html">
+  <a class="nav-logo" href="index (10).html">
     <div class="nav-logo-icon">🔍</div>
     <div class="nav-logo-text">Vision<span>Cloud</span></div>
   </a>
   <ul class="nav-links">
-    <li><a href="index.html">⚡ Analyze</a></li>
+    <li><a href="index (10).html">⚡ Analyze</a></li>
     <li><a href="#" class="active">🏗 Architecture</a></li>
     <span class="nav-badge">LIVE</span>
   </ul>
@@ -338,8 +338,11 @@
     <div class="tech-card"><div class="tech-icon">🌐</div><div class="tech-name">GitHub Pages</div><div class="tech-role">Frontend Host</div></div>
     <div class="tech-card"><div class="tech-icon">⚡</div><div class="tech-name">Render</div><div class="tech-role">Cloud Backend</div></div>
     <div class="tech-card"><div class="tech-icon">🖼️</div><div class="tech-name">Cloudinary</div><div class="tech-role">Image Storage</div></div>
-    <div class="tech-card"><div class="tech-icon">🤗</div><div class="tech-name">Hugging Face</div><div class="tech-role">Vision AI</div></div>
+    <div class="tech-card"><div class="tech-icon">🤗</div><div class="tech-name">Hugging Face</div><div class="tech-role">5 Vision Models</div></div>
     <div class="tech-card"><div class="tech-icon">🗄️</div><div class="tech-name">Supabase</div><div class="tech-role">PostgreSQL DB</div></div>
+    <div class="tech-card"><div class="tech-icon">🔐</div><div class="tech-name">Supabase Auth</div><div class="tech-role">JWT Auth</div></div>
+    <div class="tech-card"><div class="tech-icon">📊</div><div class="tech-name">Analytics</div><div class="tech-role">Usage Dashboard</div></div>
+    <div class="tech-card"><div class="tech-icon">🏆</div><div class="tech-name">Benchmark</div><div class="tech-role">Model Comparison</div></div>
   </div>
 </section>
 
@@ -348,30 +351,46 @@
   <div class="section-label">Under the Hood</div>
   <div class="section-heading">AI Model Information</div>
   <div class="section-sub">Production-grade Vision AI running on managed cloud infrastructure.</div>
-  <div class="model-grid">
+  <div style="margin-bottom:20px;padding:14px 18px;background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.15);border-radius:14px;">
+    <div style="font-size:12px;color:var(--text2);margin-bottom:4px;font-family:'DM Mono',monospace;">Provider</div>
+    <div style="font-size:14px;font-weight:700;color:var(--text);">Hugging Face Inference API — Serverless Cloud Deployment</div>
+  </div>
+  <div class="model-grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr));">
     <div class="model-card">
-      <div class="model-card-icon">🤗</div>
-      <div class="model-card-label">Model ID</div>
-      <div class="model-card-value">google/vit-base-patch16-224</div>
+      <div class="model-card-icon">🔵</div>
+      <div class="model-card-label">Model 1</div>
+      <div class="model-card-value">ViT-Base/16</div>
       <span class="model-card-badge">Vision Transformer</span>
     </div>
     <div class="model-card">
-      <div class="model-card-icon">☁️</div>
-      <div class="model-card-label">Provider</div>
-      <div class="model-card-value">Hugging Face Inference API</div>
-      <span class="model-card-badge">Managed Cloud</span>
+      <div class="model-card-icon">🟢</div>
+      <div class="model-card-label">Model 2</div>
+      <div class="model-card-value">ResNet-50</div>
+      <span class="model-card-badge">Residual Network</span>
     </div>
     <div class="model-card">
-      <div class="model-card-icon">🔬</div>
-      <div class="model-card-label">Task Type</div>
-      <div class="model-card-value">Image Classification</div>
-      <span class="model-card-badge">Computer Vision</span>
+      <div class="model-card-icon">🟡</div>
+      <div class="model-card-label">Model 3</div>
+      <div class="model-card-value">EfficientNet-B0</div>
+      <span class="model-card-badge">EfficientNet</span>
     </div>
     <div class="model-card">
-      <div class="model-card-icon">⚡</div>
-      <div class="model-card-label">Deployment</div>
-      <div class="model-card-value">Cloud API via REST</div>
-      <span class="model-card-badge">Serverless</span>
+      <div class="model-card-icon">🟣</div>
+      <div class="model-card-label">Model 4</div>
+      <div class="model-card-value">ConvNeXt-Tiny</div>
+      <span class="model-card-badge">Modern CNN</span>
+    </div>
+    <div class="model-card">
+      <div class="model-card-icon">🔴</div>
+      <div class="model-card-label">Model 5</div>
+      <div class="model-card-value">BEiT-Base/16</div>
+      <span class="model-card-badge">BERT for Vision</span>
+    </div>
+    <div class="model-card">
+      <div class="model-card-icon">⭐</div>
+      <div class="model-card-label">Benchmark</div>
+      <div class="model-card-value">All 5 in Parallel</div>
+      <span class="model-card-badge">Side-by-Side</span>
     </div>
   </div>
 </section>
@@ -430,6 +449,30 @@
       <div class="highlight-icon">⚡</div>
       <div class="highlight-title">Real-Time Processing</div>
       <div class="highlight-desc">Instant AI inference pipeline with live loading states and animated results</div>
+    </div>
+    <div class="highlight-card">
+      <div class="highlight-check">✓</div>
+      <div class="highlight-icon">🔐</div>
+      <div class="highlight-title">User Authentication</div>
+      <div class="highlight-desc">JWT-based auth via Supabase Auth — each user sees only their own scan history</div>
+    </div>
+    <div class="highlight-card">
+      <div class="highlight-check">✓</div>
+      <div class="highlight-icon">🏆</div>
+      <div class="highlight-title">Multi-Model Benchmark</div>
+      <div class="highlight-desc">Run 5 AI models in parallel — compare confidence scores, speed and labels side by side</div>
+    </div>
+    <div class="highlight-card">
+      <div class="highlight-check">✓</div>
+      <div class="highlight-icon">📊</div>
+      <div class="highlight-title">Analytics Dashboard</div>
+      <div class="highlight-desc">Scans per day chart, top labels frequency, activity timeline and live stat counters</div>
+    </div>
+    <div class="highlight-card">
+      <div class="highlight-check">✓</div>
+      <div class="highlight-icon">🎯</div>
+      <div class="highlight-title">Confidence Scores</div>
+      <div class="highlight-desc">Real confidence percentages from Hugging Face with animated rank bars per prediction</div>
     </div>
   </div>
 </section>
