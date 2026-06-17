@@ -31,9 +31,9 @@ HF_HEADERS   = {"Authorization": f"Bearer {HF_API_TOKEN}"}
 ALLOWED_MODELS = {
     "google/vit-base-patch16-224",
     "microsoft/resnet-50",
-    "google/efficientnet-b0",
-    "facebook/convnext-tiny-224",
-    "microsoft/beit-base-patch16-224",
+    "google/mobilenet_v2_1.0_224",
+    "microsoft/swin-tiny-patch4-window7-224",
+    "facebook/deit-base-distilled-patch16-224",
 }
 DEFAULT_MODEL = "google/vit-base-patch16-224" 
 
